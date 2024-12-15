@@ -2,7 +2,7 @@
   <div id="main">
     <div id="header">
       <h2>Presupuestos</h2>
-      <button @click="toggleBudget()" title="Crear Presupuesto"><i class="fa-solid fa-add"></i></button>
+			<button @click="toggleBudget()" title="Crear Presupuesto"><svg-icon type="mdi" :path="mdiPlus" /></button>
     </div>
 		<component :is="budgetComponent" @destroy="budgetComponent = null"/>
     <ul>
@@ -15,23 +15,26 @@
 import { ref } from 'vue';                
 import { useRouter } from 'vue-router';            
 import CreateBudget from "../components/CreateBudget.vue";
+import SvgIcon from '@jamescoyle/vue-icon';
+import { mdiPlus } from "@mdi/js";
 
 export default {
 	name: 'Budgets',
-	components: {CreateBudget},
+	components: {CreateBudget, SvgIcon},
 	setup() {
 		const budgetComponent = ref(null);
 
 		const toggleBudget = () => {
 			if (!budgetComponent.value) {
-        budgetComponent.value = CreateBudget; // Crear el componente
+        budgetComponent.value = CreateBudget;
       } else {
-        budgetComponent.value = null; // Eliminar el componente
+        budgetComponent.value = null;
       }
 		};
 	return {
 		toggleBudget,
 		budgetComponent,
+		mdiPlus,
 	};                                             
 },
 };
@@ -52,13 +55,20 @@ export default {
   margin-left: 2rem;
 }
 #header > button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
   margin: .4rem;
   height: 2rem;
   width:  2rem;
   outline: none;
   border: none;
-  border-radius: 50%;
-  background-color: #3aa;
+  border-radius: .4rem;
 	cursor: pointer;
+  background: #24c8db20;
+	transition: background .3s;
+}
+#header > button:hover {
+  background: #44e8fb80;
 }
 </style>
