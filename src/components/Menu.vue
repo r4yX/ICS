@@ -142,7 +142,7 @@ hr {
 	cursor: pointer;
   top: 1rem;
   left: 14.5rem;
-  background: #2478abf0;
+  background: #44e8fb80;
   align-items: center;
   justify-content: center;
   font-size: 25px;
