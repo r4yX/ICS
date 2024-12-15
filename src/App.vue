@@ -22,10 +22,10 @@ export default {
 #main {
   display: flex;
 	flex-direction: row; 
-  height: 100vh; /* Asegura que todo ocupe el alto completo de la ventana */
+  height: 100vh;
 }
 
 .content {
-  flex-grow: 1; /* Ocupa el espacio restante */
+  flex-grow: 1;
 }
 </style>
