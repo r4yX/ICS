@@ -13,7 +13,6 @@
 
 <script>                                           
 import { ref } from 'vue';                
-import { useRouter } from 'vue-router';            
 import CreateBudget from "../components/CreateBudget.vue";
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiPlus } from "@mdi/js";

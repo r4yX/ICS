@@ -3,7 +3,7 @@
   <div id="create-budget" :class="{ hidden: !isBudget }">
     <button @click="toggleBudget()" id="cancel" title="Cancelar"><i class="fa-solid fa-xmark"></i></button>
     <h2 id="budget-number">N° 0001-0000001</h2>
-    <form id="budget-form">
+		<form id="budget-form">
 			<div class="rows">
 				<div class="in-row">
 					<label for="customer">Cliente</label>
@@ -162,7 +162,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 /* --  Create budget box  -- */
 #blur {
   position: absolute;
