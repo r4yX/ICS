@@ -1,6 +1,6 @@
 <template>
   <div id="menu" :class="{ hidden: isMenuHidden }">
-    <button id="toggle-menu" @click="toggleMenu()"><i class="fa-solid fa-angle-left"></i></button>
+		<button id="toggle-menu" @click="toggleMenu()"><svg-icon type="mdi" :path="mdiChevronLeft" /></button>
     <ul>
 			<button @click="navigateTo('budgets')"><svg-icon type="mdi" :path="mdiNoteText"></svg-icon><p>Presupuesto</p></button>
 			<button @click="navigateTo('works')"><svg-icon type="mdi" :path="mdiNoteCheck"></svg-icon><p>Orden de Trabajo</p></button>
@@ -22,7 +22,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import SvgIcon from '@jamescoyle/vue-icon';
-import { mdiNoteText, mdiNoteCheck, mdiClock, mdiAccount, mdiCar, mdiFileTable,
+import { mdiChevronLeft, mdiNoteText, mdiNoteCheck, mdiClock, mdiAccount, mdiCar, mdiFileTable,
 				mdiCashRegister, mdiAccountHardHat, mdiShopping, mdiCog} from '@mdi/js';
 
 export default {
@@ -50,6 +50,7 @@ export default {
       navigateTo,
       toggleMenu,
 			// Icons
+			mdiChevronLeft,
 			mdiNoteText,
 			mdiNoteCheck,
 			mdiClock,
@@ -66,7 +67,6 @@ export default {
 </script>
 
 <style scoped>
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 * {
   list-style: none;
   color: #eee;
