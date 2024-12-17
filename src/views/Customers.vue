@@ -15,7 +15,7 @@ import { mdiPlus } from '@mdi/js';
 import CreateCustomer from "../components/CreateCustomer.vue";
 
 export default {
-  name: 'Works',
+  name: 'Customers',
   components: {
     SvgIcon,
 		CreateCustomer

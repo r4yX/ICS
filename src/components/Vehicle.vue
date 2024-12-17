@@ -1,4 +1,3 @@
-
 <template>
 	<div class="item">
 		<p title="Patente">{{ plate }}</p>
