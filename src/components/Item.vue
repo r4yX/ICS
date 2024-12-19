@@ -8,15 +8,23 @@
 		<p title="IVA ($)">${{ detail.iva }}</p>
 		<p title="Total">${{ detail.total }}</p>
 		<button id="del-btn" @click="delDetail(index)" type="button">
-			<i class="fa-solid fa-trash"></i>
+			<svg-icon type="mdi" :path="mdiDelete" />
 		</button>
 	</div>
 </template>
 
 <script>
 import { ref } from "vue";
+import SvgIcon from '@jamescoyle/vue-icon';
+import { mdiDelete } from '@mdi/js';
 
 export default {
+	setup() {
+		return { mdiDelete }
+	},
+	components: {
+	SvgIcon,
+	},
 	props: {
 		detail: {
 			type: Object,
@@ -36,24 +44,33 @@ export default {
 
 <style scoped>
 .item {
-	width: 100%;
+	width: 96%;
 	display: grid;
 	gap: 10px;
-	grid-template-columns: 64px 74px 63px 100px 130px 64px 54px auto;
+	grid-template-columns: 60px 74px 50px 120px 120px 52px 54px auto;
 	justify-content: start;
 	align-items: center;
 }
 .item > * {
 	padding: 0 10px;
+	margin: 2px 0 2px 0;
 }
 
 #del-btn {
-	cursor: pointer;
-	border: none;
+	padding: 2px 6px 3px 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #333;
+	color: #ccc;
 	height: 2rem;
 	width: 2rem;
-	background-color: #a33;
-	border-radius: .3rem;
-	color: #ccc;
+	border: 1px solid #999;
+	border-radius: .4rem;
+	cursor: pointer;
+	transition: background .2s;
+}
+#del-btn:hover {
+	background: #543c3c;
 }
 </style>
