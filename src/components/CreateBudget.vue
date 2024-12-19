@@ -1,7 +1,7 @@
 <template>
   <div id="blur" :class="{ hidden: !isBudget }">
   <div id="create-budget" :class="{ hidden: !isBudget }">
-    <button @click="toggleBudget()" id="cancel" title="Cancelar"><i class="fa-solid fa-xmark"></i></button>
+		<button @click="toggleBudget()" id="cancel" title="Cancelar"><svg-icon type="mdi" :path="mdiClose" /></button>
     <h2 id="budget-number">N° 0001-0000001</h2>
 		<form id="budget-form">
 			<div class="rows">
@@ -69,7 +69,7 @@
 					placeholder="Producto o Servicio"
 				/>
 				<input id="iva" v-model="iva" placeholder="21" pattern="\d*"></input>
-				<button id="save-item" title="Añadir item" @click="addDetail" type="button"><i class="fa-solid fa-add"></i></button> 
+				<button id="save-item" title="Añadir item" @click="addDetail" type="button"><svg-icon type="mdi" :path="mdiPlus" /></button> 
       </div>
 		<div id="details">
 			<p>Item</p>
@@ -88,7 +88,7 @@
         :delDetail="delDetail"
       />
     </form>
-    <button id="confirm" title="Crear Presupuesto" @click="createBudget" type="button"><i class="fa-solid fa-check"></i></button>
+		<button id="confirm" title="Crear Presupuesto" @click="createBudget" type="button"><svg-icon type="mdi" :path="mdiCheck"/></button>
   </div>
 	</div>
 </template>
@@ -96,6 +96,8 @@
 <script>
 import { ref } from 'vue';                
 import VueSelect from "vue3-select-component";
+import SvgIcon from '@jamescoyle/vue-icon';
+import { mdiClose, mdiPlus, mdiCheck } from '@mdi/js';
 import Item from "../components/Item.vue";
 
 const customer = ref("");
@@ -120,6 +122,7 @@ export default {
 	},
 	name: 'CreateBudget',
 	components: {
+		SvgIcon,
 		VueSelect,
 		Item,
 	},
@@ -153,10 +156,14 @@ export default {
 			details,
 			// Inside detail
 			item, price, cant, tipo, iva,
-			// Funtions
+			// Functions
 			addDetail,
 			delDetail,
 			createBudget,
+			// Icons
+			mdiClose,
+			mdiPlus,
+			mdiCheck
 		};
 	},
 };
@@ -190,31 +197,37 @@ export default {
   left: 5%;
   display: flex;
   background-color: #202020;
-  border: 2px solid #668076;
+  border: 2px solid #444;
   border-radius: 9px;
 }
 #create-budget > button {
   position: absolute;
   display: flex;
   cursor: pointer;
-  height: 30px;
-  width: 30px;
-  border: none;
+  height: 2rem;
+  width: 2rem;
+  border: 1px solid #999;
   outline: none;
-  border-radius: 50%;
+  border-radius: .4rem;
+  background: #333;
   color: white;
   align-items: center;
   justify-content: center;
+	transition: background .2s;
 }
 #cancel {
   top: .6rem;
   left: .6rem;
-  background: #800;
 }
 #confirm {
   bottom: .6rem;
   right: .6rem;
-  background: #080;
+}
+#cancel:hover {
+	background: #543c3c;
+}
+#confirm:hover {
+	background: #434f3b;
 }
 #budget-number {
   margin: 0px;
@@ -229,7 +242,7 @@ export default {
   background-color: red;
 }
 #budget-form {
-	height: 90%;
+	height: 78%;
   width: 90%;
   display: flex;
   flex-direction: column;
@@ -265,28 +278,41 @@ export default {
 }
 /* --  Table  -- */
 #table {
+	width: 95%;
+	margin: 0;
 	margin-top: 2rem;
+	align-items: center;
 	display: grid;
 	gap: 10px;
-	grid-template-columns: 15rem auto 3rem 12rem auto 1.8rem;
+	grid-template-columns: 15rem 5rem 3rem 12rem 3rem 1.8rem;
 }
+#price, #stotal {width: 4.2rem;}
+
 #cant,
 #iva
 {width: 2rem;}
-#price, #stotal {width: 4.2rem;}
+
 #item,
 #tipo,
 {width: 9rem;}
+
 #save-item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	cursor: pointer;
-	border: none;
 	height: 2rem;
 	width: 2rem;
-	background-color: #3aa;
-	border-radius: .3rem;
+	background: #333;
+	border: 1px solid #999;
+	border-radius: .4rem;
+	transition: background .2s;
+}
+#save-item:hover {
+	background: #088;
 }
 #details {
-	width: 100%;
+	width: 98%;
 	display: grid;
 	gap: 10px;
 	grid-template-columns: auto auto auto 110px 130px auto auto auto;
@@ -296,6 +322,7 @@ export default {
 #details > * {
 	text-decoration: underline;
 	padding: 0 12px;
+	margin-bottom: 8px;
 }
 /* --  Custom Select  -- */
 :deep(.vue-select) {
