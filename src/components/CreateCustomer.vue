@@ -155,10 +155,11 @@ export default {
   position: absolute;
   display: flex;
   cursor: pointer;
-  height: 30px;
-  width: 30px;
-  border: none;
+	height: 2rem;
+	width: 2rem;
   outline: none;
+	background: #333;
+  border: 1px solid #999;
   border-radius: .4rem;
   color: white;
   align-items: center;
@@ -167,12 +168,18 @@ export default {
 #cancel {
   top: .6rem;
   left: .6rem;
-  background: #800;
+	transition: background .2s;
 }
 #confirm {
   bottom: .6rem;
   right: .6rem;
-  background: #080;
+	transition: background .2s;
+}
+#cancel:hover {
+	background: #543c3c;
+}
+#confirm:hover {
+	background: #434f3b;
 }
 #customer-form {
 	height: 90%;
@@ -214,22 +221,29 @@ export default {
 }
 #vehicle-row {
 	display: flex;
+	align-items: center;
 }
 #vehicle-row > button {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	height: 34px;
-	width: 34px;
-	border: none;
+	height: 2rem;
+	width: 2rem;
 	margin-left: .5rem;
-  background: #24c8db20;
-	transition: background .3s;
+	background: #333;
+	color: white;
+	border: 1px solid #999;
 	border-radius: .4rem;
+	transition: background .3s;
+}
+#vehicle-row > button:disabled {
+	border: none;
+	color: #777;
+	cursor: not-allowed;
 }
 #vehicle-row > button:not([disabled]):hover {
 	cursor: pointer;
-  background: #44e8fb80;
+  background: #3d5859;
 }
 /* --  Custom Select  -- */
 :deep(.vue-select) {
