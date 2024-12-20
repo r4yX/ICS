@@ -145,6 +145,13 @@ export default {
 				iva: ivaPrice,
 				total});
 		};
+
+		addEventListener('keydown', (e) => {
+			if (e.keyCode == 27) {
+				let cancelBtn = document.querySelector('#cancel')
+				cancelBtn.click()
+			}
+		})
     // -- Return
 		return {
 			isBudget,
