@@ -2,15 +2,21 @@
 	<div class="item">
 		<p title="Patente">{{ plate }}</p>
 		<button id="del-btn" @click="delCar(index)" type="button">
-			<i class="fa-solid fa-trash"></i>
+			<svg-icon type="mdi" :path="mdiDelete"></svg-icon>
 		</button>
 	</div>
 </template>
 
 <script>
 import { ref } from "vue";
+import SvgIcon from '@jamescoyle/vue-icon';
+import { mdiDelete } from '@mdi/js';
 
 export default {
+	components: { SvgIcon },
+	setup() {
+		return { mdiDelete }
+	},
 	props: {
 		plate: {
 			type: String,
@@ -41,13 +47,21 @@ export default {
 	padding: 0 10px;
 }
 #del-btn {
-	cursor: pointer;
-	border: none;
+	padding: 2px 6px 3px 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	height: 2rem;
 	width: 2rem;
-	background-color: #a33;
+	background: #333;
+	cursor: pointer;
+	border: 1px solid #999;
 	border-radius: .4rem;
-	color: #ccc;
+	color: white;
 	margin-left: 1.4rem;
+	transition: background .2s;
+}
+#del-btn:hover {
+	background: #543c3c;
 }
 </style>
