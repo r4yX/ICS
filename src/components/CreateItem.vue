@@ -134,22 +134,28 @@ export default {
   cursor: pointer;
   height: 30px;
   width: 30px;
-  border: none;
   outline: none;
+  border: 1px solid #999;
   border-radius: .4rem;
-  color: white;
-  align-items: center;
-  justify-content: center;
+	background: #333;
+	color: white;
+	align-items: center;
+	justify-content: center;
+	transition: background .2s;
 }
 #cancel {
-  top: .6rem;
-  left: .6rem;
-  background: #800;
+	top: .6rem;
+	left: .6rem;
 }
 #confirm {
-  bottom: .6rem;
-  right: .6rem;
-  background: #080;
+	bottom: .6rem;
+	right: .6rem;
+}
+#cancel:hover {
+	background: #543c3c;
+}
+#confirm:hover {
+	background: #434f3b;
 }
 #item-form {
 	height: 90%;
