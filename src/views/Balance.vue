@@ -26,7 +26,6 @@ export default {
 
 		const updateSelectedDay = (day) => {
 			selectedDay.value = day
-			console.log(day)
 		}
 
 		return {

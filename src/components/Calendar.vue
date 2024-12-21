@@ -114,21 +114,23 @@ export default {
   text-align: center;
   line-height: 2rem;
   cursor: pointer;
+	background: #333;
   border: 1px solid #ccc;
   margin: 0.2rem;
 	border-radius: .4rem;
+	transition: background .2s;
 }
 .day.header {
   font-weight: bold;
-  background-color: #44e8fb80;
+  background-color: #465d5e;
 	cursor: default;
 }
 .day.empty {
-  background-color: #ccc3;
+  background-color: #222;
+	border: 1px solid #222;
   cursor: default;
-  color: #ccc;
 }
 .day:not(.empty):not(.header):hover {
-  background-color: #e0e0ff;
+  background: #777;
 }
 </style>
