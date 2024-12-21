@@ -126,24 +126,30 @@ export default {
   position: absolute;
   display: flex;
   cursor: pointer;
-  height: 30px;
-  width: 30px;
-  border: none;
   outline: none;
+  height: 2rem;
+  width: 2rem;
+  border: 1px solid #999;
   border-radius: .4rem;
+	background: #333;
   color: white;
   align-items: center;
   justify-content: center;
+	transition: background .2s;
 }
 #cancel {
   top: .6rem;
   left: .6rem;
-  background: #800;
 }
 #confirm {
   bottom: .6rem;
   right: .6rem;
-  background: #080;
+}
+#cancel:hover {
+	background: #543c3c;
+}
+#confirm:hover {
+	background: #434f3b;
 }
 #vehicle-form {
 	height: 90%;
