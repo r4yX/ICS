@@ -35,14 +35,4 @@ export default {
 #header > h2 {
   margin-left: 3rem;
 }
-#header > button {
-  margin: .4rem;
-  height: 2rem;
-  width:  2rem;
-  outline: none;
-  border: none;
-  border-radius: 50%;
-  background-color: #3aa;
-	cursor: pointer;
-}
 </style>
