@@ -69,10 +69,16 @@ export default {
 }
 #card > button {
 	font-size: 18px;
-	padding: 3px 8px;
+	padding: .5rem 1rem;
 	outline: none;
-	border: none;
+	color: white;
+	background: #333;
+	border: 1px solid #999;
 	border-radius: .4rem;
 	cursor: pointer;
+	transition: background .2s;
+}
+#card > button:hover {
+	background: #555;
 }
 </style>
