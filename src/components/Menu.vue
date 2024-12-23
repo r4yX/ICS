@@ -12,7 +12,6 @@
       <hr>
       <button @click="navigateTo('balance')"><svg-icon type="mdi" :path="mdiCashRegister"></svg-icon><p>Balance</p></button>
       <button @click="navigateTo('workers')"><svg-icon type="mdi" :path="mdiAccountHardHat"></svg-icon><p>Trabajadores</p></button>
-      <button @click="navigateTo('shop')"><svg-icon type="mdi" :path="mdiShopping"></svg-icon><p>Tienda</p></button>
       <button @click="navigateTo('config')" id="config"><svg-icon type="mdi" :path="mdiCog"></svg-icon><p>Configuración</p></button>
     </ul>
   </div>
