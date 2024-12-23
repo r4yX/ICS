@@ -7,7 +7,6 @@ import Vehicles from './views/Vehicles.vue';
 import Inventory from './views/Inventory.vue'; 
 import Balance from './views/Balance.vue'; 
 import Workers from './views/Workers.vue'; 
-import Shop from './views/Shop.vue'; 
 import Config from './views/Config.vue'; 
 
 const routes = [
