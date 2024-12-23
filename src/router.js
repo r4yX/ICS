@@ -18,7 +18,6 @@ const routes = [
   { path: '/inventory', name: 'inventory', component: Inventory },
   { path: '/balance', name: 'balance', component: Balance },
   { path: '/workers', name: 'workers', component: Workers },
-  { path: '/shop', name: 'shop', component: Shop },
   { path: '/config', name: 'config', component: Config },
 ];
 
