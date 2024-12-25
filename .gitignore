@@ -26,5 +26,6 @@ dist-ssr
 
 # Added by cargo
 
-/target
+/src-tauri/target
+/src-tauri/gen
 /src/debug.db
