@@ -2,7 +2,14 @@ mod database;
 
 #[tauri::command]
 fn insert_budget(customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) {
-   let _ = database::insert_budget(customer, vehicle, concept, kilometrage, total).unwrap();
+   database::insert_budget(customer, vehicle, concept, kilometrage, total).unwrap();
+}
+#[tauri::command]
+fn create_customer(name: &str, phone: &str, cuil: &str, dni: &str, tipo: &str, vehicles: Vec<&str>) {
+    let _ = database::insert_customer(name, phone, cuil, dni, tipo);
+    for vehicle in vehicles.iter() {
+        // insert vehicle in vehicles table
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
