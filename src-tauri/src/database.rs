@@ -24,3 +24,9 @@ pub fn insert_vehicles(domain: &str, maker: &str, model: &str, tipo: &str, colou
     )?;
     Ok(())
 }
+pub fn update_vehicles(domain: &str, owner: &str) {
+    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
+    conn.execute(
+        format!("UPDATE vehicles SET owner='{}' WHERE domain='{}'" owner, domain)
+    )?;
+}

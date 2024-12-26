@@ -8,7 +8,7 @@ fn insert_budget(customer: &str, vehicle: &str, concept: &str, kilometrage: f32,
 fn create_customer(name: &str, phone: &str, cuil: &str, dni: &str, tipo: &str, vehicles: Vec<&str>) {
     let _ = database::insert_customer(name, phone, cuil, dni, tipo);
     for vehicle in vehicles.iter() {
-        // insert vehicle in vehicles table
+        database::update_vehicle(vehicle, name);
     }
 }
 
