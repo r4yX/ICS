@@ -16,3 +16,11 @@ pub fn insert_customer(name: &str, phone: &str, tipo: &str, cuit: &str, dni: &st
     )?;
     Ok(())
 }
+pub fn insert_vehicles(domain: &str, maker: &str, model: &str, tipo: &str, colour: &str, year: u8, owner: &str) {
+    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
+    conn.execute(
+        "INSERT INTO vehicles (domain, maker, model, tipo, colour, year, owner) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+        params![domain, maker, model, tipo, colour, year, owner],
+    )?;
+    Ok(())
+}
