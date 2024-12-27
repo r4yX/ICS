@@ -20,7 +20,7 @@ fn insert_item(id: &str, name: &str, price: &str, tipo: &str, manufacturer: &str
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![insert_budget, create_customer])
+        .invoke_handler(tauri::generate_handler![insert_budget, create_customer, insert_item])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
