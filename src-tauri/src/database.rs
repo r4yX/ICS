@@ -30,3 +30,11 @@ pub fn update_vehicles(domain: &str, owner: &str) {
         format!("UPDATE vehicles SET owner='{}' WHERE domain='{}'" owner, domain)
     )?;
 }
+pub fn insert_item(id, name, price, tipo, manufacturer, supplier, model, stock) {
+    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
+    conn.execute(
+        "INSERT INTO inventory (id, name, price, tipo, manufacturer, supplier, model, stock) VALUES (?1, ?2, ?3, ?4, ?5, ?7, ?8)",
+        params![id, name, price, tipo, manufacturer, supplier, model, stock],
+    )?;
+    Ok(())
+}

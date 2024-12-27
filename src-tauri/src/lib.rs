@@ -1,4 +1,4 @@
-mod database;
+use database;
 
 #[tauri::command]
 fn insert_budget(customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) {
@@ -10,6 +10,10 @@ fn create_customer(name: &str, phone: &str, cuil: &str, dni: &str, tipo: &str, v
     for vehicle in vehicles.iter() {
         database::update_vehicle(vehicle, name);
     }
+}
+#[tauri::command]
+fn insert_item(id: &str, name: &str, price: &str, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: &str) {
+    database::insert_item(id, name, price, tipo, manufacturer, supplier, model, stock)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
