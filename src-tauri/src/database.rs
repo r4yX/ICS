@@ -16,7 +16,7 @@ pub fn insert_customer(name: &str, phone: &str, tipo: &str, cuit: &str, dni: &st
     )?;
     Ok(())
 }
-pub fn insert_vehicles(domain: &str, maker: &str, model: &str, tipo: &str, colour: &str, year: u8, owner: &str) {
+pub fn insert_vehicles(domain: &str, maker: &str, model: &str, tipo: &str, colour: &str, year: u8, owner: &str) -> Result<()> {
     let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
     conn.execute(
         "INSERT INTO vehicles (domain, maker, model, tipo, colour, year, owner) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
@@ -24,13 +24,15 @@ pub fn insert_vehicles(domain: &str, maker: &str, model: &str, tipo: &str, colou
     )?;
     Ok(())
 }
-pub fn update_vehicles(domain: &str, owner: &str) {
+pub fn update_vehicles(domain: &str, owner: &str) -> Result <()>{
     let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
     conn.execute(
-        format!("UPDATE vehicles SET owner='{}' WHERE domain='{}'" owner, domain)
+        "UPDATE vehicles SET owner='?1' WHERE domain='?2'",
+        params![owner, domain]
     )?;
+    Ok(())
 }
-pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) {
+pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) -> Result<()> {
     let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
     conn.execute(
         "INSERT INTO inventory (id, name, price, tipo, manufacturer, supplier, model, stock) VALUES (?1, ?2, ?3, ?4, ?5, ?7, ?8)",
