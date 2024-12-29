@@ -2,8 +2,9 @@ mod database;
 use database::*;
 
 #[tauri::command]
-fn create_budget(customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) {
+fn create_budget(date: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) {
    insert_budget(customer, vehicle, concept, kilometrage, total).unwrap();
+   update_balance(date, "Ingreso", total, &format!("{} - {}", customer, concept)).unwrap();
 }
 #[tauri::command]
 fn create_customer(name: &str, phone: &str, cuil: &str, dni: &str, tipo: &str, vehicles: Vec<&str>) {
