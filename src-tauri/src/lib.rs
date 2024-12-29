@@ -9,12 +9,12 @@ fn create_budget(customer: &str, vehicle: &str, concept: &str, kilometrage: f32,
 fn create_customer(name: &str, phone: &str, cuil: &str, dni: &str, tipo: &str, vehicles: Vec<&str>) {
     let _ = database::insert_customer(name, phone, cuil, dni, tipo);
     for vehicle in vehicles.iter() {
-        update_vehicles(vehicle, name);
+        let _ = update_vehicles(vehicle, name);
     }
 }
 #[tauri::command]
 fn create_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) {
-    insert_item(id, name, price, tipo, manufacturer, supplier, model, stock)
+    let _ = insert_item(id, name, price, tipo, manufacturer, supplier, model, stock);
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
