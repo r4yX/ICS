@@ -40,3 +40,11 @@ pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &
     )?;
     Ok(())
 }
+pub fn update_balance(date: &str, tipo: &str, amount: f32, name: &str) -> Result<()> {
+    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
+    conn.execute(
+        "INSERT balance (date, tipo, amount, name) VALUES (?1, ?2, ?3, ?4)",
+        params![date, tipo, amount, name],
+    )?;
+    Ok(())
+}
