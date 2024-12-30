@@ -48,3 +48,11 @@ pub fn update_balance(date: &str, tipo: &str, amount: f32, name: &str) -> Result
     )?;
     Ok(())
 }
+pub fn read_budget(id: &str) -> Result<()> {
+    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
+    conn.execute(
+        "SELECT * FROM budget WHERE id='?1'",
+        params![id],
+    )?;
+    Ok(())
+}
