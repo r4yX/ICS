@@ -1,6 +1,15 @@
 use rusqlite::{params, Connection, Result};
 
-pub fn insert_budget(customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) -> Result<()> {
+struct Budget  {
+    id: String,
+    customer: String,
+    vehicle: String,
+    concept: String,
+    kilometrage: f32,
+    total: f32,
+}
+
+pub fn insert_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) -> Result<()> {
     let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
     conn.execute(
         "INSERT INTO budgets (client, vehicle, concept, kilometrage, total) VALUES (?1, ?2, ?3, ?4, ?5)",
@@ -48,11 +57,25 @@ pub fn update_balance(date: &str, tipo: &str, amount: f32, name: &str) -> Result
     )?;
     Ok(())
 }
-pub fn read_budget(id: &str) -> Result<()> {
+pub fn insert_order(id: &str, client: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, paid: f32) -> Result<()> {
     let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
     conn.execute(
-        "SELECT * FROM budget WHERE id='?1'",
-        params![id],
+        "INSERT INTO orders (id, client, vehicle, concept, kilometrage, total, paid) VALUES (?1, ?2, ?3, ?4)",
+        params![id, client, vehicle, concept, kilometrage, total, paid],
     )?;
     Ok(())
+}
+pub fn read_budget(id: &str) -> Result<Budget> {
+    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
+    let mut budget = conn.prepare("SELECT * FROM budget WHERE id=?")?;
+    budget.query_row(params![id], |row| {
+        Ok(Budget {
+            id: row.get(0)?,
+            customer: row.get(1)?,
+            vehicle: row.get(2)?,
+            concept: row.get(3)?,
+            kilometrage: row.get(4)?,
+            total: row.get(5)?,
+        });
+    })?;
 }
