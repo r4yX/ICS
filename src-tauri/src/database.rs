@@ -1,10 +1,10 @@
 use rusqlite::{params, Connection, Result};
 
-struct Budget  {
-    id: String,
-    customer: String,
-    vehicle: String,
-    concept: String,
+pub struct Budget  {
+    id: &str,
+    customer: &str,
+    vehicle: &str,
+    concept: &str,
     kilometrage: f32,
     total: f32,
 }
@@ -65,7 +65,7 @@ pub fn insert_order(id: &str, client: &str, vehicle: &str, concept: &str, kilome
     )?;
     Ok(())
 }
-pub fn read_budget(id: &str) -> Result<Budget> {
+pub fn read_budget(id: &str) -> Result<Budget, String> {
     let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
     let mut budget = conn.prepare("SELECT * FROM budget WHERE id=?")?;
     budget.query_row(params![id], |row| {
@@ -78,4 +78,5 @@ pub fn read_budget(id: &str) -> Result<Budget> {
             total: row.get(5)?,
         });
     })?;
+    Ok("");
 }
