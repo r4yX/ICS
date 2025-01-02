@@ -49,12 +49,16 @@ fn create_customer(name: &str, phone: &str, cuil: &str, dni: &str, tipo: &str, v
 fn create_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) {
     let _ = insert_item(id, name, price, tipo, manufacturer, supplier, model, stock);
 }
+#[tauri::command]
+fn create_worker(name: &str, dni: &str, phone: &str, address: &str, salary: f32) -> Result<String> {
+    let _ = database::insert_worker(name, dni, phone, address, salary);
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item, create_order])
+        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item, create_order, create_worker])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

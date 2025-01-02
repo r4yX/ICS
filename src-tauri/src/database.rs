@@ -89,7 +89,7 @@ pub fn read_budget(id: &str) -> Result<Budget, String> {
         Err(_) => Err("Budget not found".to_string()),
     }
 }
-pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, subtotal: f32, iva: u8, total: f32) -> Result <String, String>{
+pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, subtotal: f32, iva: u8, total: f32) -> Result<String, String> {
     let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
@@ -98,7 +98,20 @@ pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, sub
         "INSERT INTO details (id, item, price, cant, tipo, subtotal, iva, total) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
         params![id, item, price, cant, tipo, subtotal, iva, total],
     ) {
-        Ok(_) => Ok("ok".to_string()),
-        Err(_) => Err("skibidi".to_string()),
+        Ok(_) => Ok("Details added successfuly".to_string()),
+        Err(_) => Err("Error writing details".to_string()),
+    }
+}
+pub fn insert_worker(name: &str, dni: &str, phone: &str, address: &str, salary: f32) -> Result<String> {
+    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    match conn.execute(
+        "INSERT INTO workers (name, dni, phone, address, salary) VALUES (?1, ?2, ?3, ?4, ?5)",
+        params![name, dni, phone, address, salary],
+    ) {
+        Ok(_) => Ok("Worker added successfuly".to_string()),
+        Err(_) => Err("Error writing worker".to_string()),
     }
 }
