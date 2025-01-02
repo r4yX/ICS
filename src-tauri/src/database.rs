@@ -1,19 +1,19 @@
 use rusqlite::{params, Connection, Result};
 
-pub struct Budget  {
+pub struct Budget {
     // is stupid return 'id' field
-    customer: &str,
-    vehicle: &str,
-    concept: &str,
-    kilometrage: f32,
-    total: f32,
+    pub customer: String,
+    pub vehicle: String,
+    pub concept: String,
+    pub kilometrage: f32,
+    pub total: f32,
 }
 
 pub fn insert_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) -> Result<()> {
     let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
     conn.execute(
-        "INSERT INTO budgets (client, vehicle, concept, kilometrage, total) VALUES (?1, ?2, ?3, ?4, ?5)",
-        params![customer, vehicle, concept, kilometrage, total],
+        "INSERT INTO budgets (id, client, vehicle, concept, kilometrage, total) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        params![id, customer, vehicle, concept, kilometrage, total],
     )?;
     Ok(())
 }
@@ -66,8 +66,14 @@ pub fn insert_order(id: &str, client: &str, vehicle: &str, concept: &str, kilome
     Ok(())
 }
 pub fn read_budget(id: &str) -> Result<Budget, String> {
-    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
-    let mut stmt  = conn.prepare("SELECT * FROM budget WHERE id=?")?;
+    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM budget WHERE id=?") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
     let budget = stmt.query_row(params![id], |row| {
         Ok(Budget {
             customer: row.get(1)?,
@@ -75,7 +81,11 @@ pub fn read_budget(id: &str) -> Result<Budget, String> {
             concept: row.get(3)?,
             kilometrage: row.get(4)?,
             total: row.get(5)?,
-        });
-    })?;
-    Ok(budget);
+        })
+    });
+
+    match budget {
+        Ok(b) => Ok(b),
+        Err(_) => Err("Budget not found".to_string()),
+    }
 }

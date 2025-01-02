@@ -7,10 +7,18 @@ fn create_budget(id: &str, date: &str, customer: &str, vehicle: &str, concept: &
    update_balance(date, "Ingreso", total, &format!("{} - {}", customer, concept)).unwrap();
 }
 #[tauri::command]
-fn create_order(id: &str, paid: f32) {
-    let (customer, vehicle, concept, kilometrage, total, paid) = read_budget(id)?;
-    insert_order(id, customer, vehicle, concept, kilometrage, total, paid);
-    Ok(())
+fn create_order(id: &str, paid: f32) -> Result<(), String> {
+
+    match read_budget("1") {
+        Ok(budget) => {
+                let _ = insert_order(
+                    id, &budget.customer, &budget.vehicle, &budget.concept,
+                    budget.kilometrage, budget.total, paid
+                );
+            Ok(())
+            }
+        Err(e) => Err(format!("Error: {}", e)),
+    }
 }
 #[tauri::command]
 fn create_customer(name: &str, phone: &str, cuil: &str, dni: &str, tipo: &str, vehicles: Vec<&str>) {
@@ -28,7 +36,7 @@ fn create_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str,
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item])
+        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item, create_order])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
