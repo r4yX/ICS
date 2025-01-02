@@ -1,14 +1,32 @@
 mod database;
 use database::*;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Detail {
+    id: String,
+    item: String,
+    price: f32,
+    cant: u8,
+    tipo: String,
+    subtotal: f32,
+    iva: u8,
+    total: f32
+}
 
 #[tauri::command]
-fn create_budget(id: &str, date: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) {
+fn create_budget(id: &str, date: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, details: &str) {
    insert_budget(id, customer, vehicle, concept, kilometrage, total).unwrap();
+
+   let details: Vec<Detail> = serde_json::from_str(details).expect("Error al deserializar");
+   for detail in details.iter() {
+       let _ = insert_detail(id, &detail.item, detail.price, detail.cant, &detail.tipo, detail.subtotal, detail.iva, detail.total);
+   }
+   // Add to balance
    update_balance(date, "Ingreso", total, &format!("{} - {}", customer, concept)).unwrap();
 }
 #[tauri::command]
 fn create_order(id: &str, paid: f32) -> Result<(), String> {
-
     match read_budget("1") {
         Ok(budget) => {
                 let _ = insert_order(
