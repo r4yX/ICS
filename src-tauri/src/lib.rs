@@ -50,8 +50,18 @@ fn create_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str,
     let _ = insert_item(id, name, price, tipo, manufacturer, supplier, model, stock);
 }
 #[tauri::command]
-fn create_worker(name: &str, dni: &str, phone: &str, address: &str, salary: f32) -> Result<String> {
-    let _ = database::insert_worker(name, dni, phone, address, salary);
+fn create_worker(name: &str, dni: &str, phone: &str, address: &str, salary: f32) -> Result<String, String> {
+    let res = database::insert_worker(name, dni, phone, address, salary)?;
+    Ok(res)
+}
+#[tauri::command]
+fn create_payment(name: &str, dni: &str, date: &str, amount: f32) -> Result<String, String> {
+    match database::insert_payment(name, dni, date, amount) {
+        Ok(_) => "",
+        Err(e) => return Err(e),
+    };
+    let res = database::update_balance(date, "Salida", amount, &format!("Pago a {}", name))?;
+    Ok(res)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
