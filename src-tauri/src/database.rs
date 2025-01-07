@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use rusqlite::{params, Connection, Result};
 
 pub struct Budget {
@@ -8,7 +9,14 @@ pub struct Budget {
     pub kilometrage: f32,
     pub total: f32,
 }
-
+pub struct Order {
+    pub customer: String,
+    pub vehicle: String,
+    pub concept: String,
+    pub kilometrage: f32,
+    pub total: f32,
+    pub paid: f32,
+}
 pub fn insert_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) -> Result<()> {
     let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
     conn.execute(
@@ -94,6 +102,65 @@ pub fn read_budget(id: &str) -> Result<Budget, String> {
         Err(_) => Err("Budget not found".to_string()),
     }
 }
+pub fn read_order(id: &str) -> Result<Order, String> {
+    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM orders WHERE id=?") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+    let order = stmt.query_row(params![id], |row| {
+        Ok(Order {
+            customer: row.get(1)?,
+            vehicle: row.get(2)?,
+            concept: row.get(3)?,
+            kilometrage: row.get(4)?,
+            total: row.get(5)?,
+            paid: row.get(6)?,
+        })
+    });
+    match order {
+        Ok(o) => Ok(o),
+        Err(_) => Err("Order not found".to_string()),
+    }
+}
+pub fn read_details(id: &str) -> Result<Vec<HashMap<String, String>>, String>{
+    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM details WHERE id=?") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+    let details_iter = match stmt.query_map([id], |row| {
+        let mut map = HashMap::new();
+        map.insert("id".to_string(), row.get(0)?);
+        map.insert("item".to_string(), row.get(1)?);
+        map.insert("price".to_string(), row.get(2)?);
+        map.insert("cant".to_string(), row.get(3)?);
+        map.insert("tipo".to_string(), row.get(4)?);
+        map.insert("subtotal".to_string(), row.get(5)?);
+        map.insert("iva".to_string(), row.get(6)?);
+        map.insert("total".to_string(), row.get(7)?);
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
+    };
+    let mut details: Vec<HashMap<String, String>> = Vec::new();
+
+    for detail in details_iter {
+        match detail {
+            Ok(d) => details.push(d),
+            Err(_) => return Err("Failed to process row".to_string()),
+        }
+    }
+
+    Ok(details)
+}
 pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, subtotal: f32, iva: u8, total: f32) -> Result<String, String> {
     let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,
@@ -131,5 +198,29 @@ pub fn insert_payment(name: &str, dni: &str, date: &str, amount: f32) -> Result<
         ) {
         Ok(_) => Ok("payment added successfully".to_string()),
         Err(_) => Err("Error writing payment".to_string()),
+    }
+}
+pub fn insert_history(id: &str, order: Order, date: &str) -> Result<String, String> {
+    // Get details with the order id
+    let details = match read_details(id) {
+        Ok(details) => details,
+        Err(_) => return Err("Error obtaining details".to_string()),
+    };
+    let details_json = match serde_json::to_string(&details) {
+        Ok(json) => json,
+        Err(_) => return Err("Failed to serialize details to JSON".to_string()),
+    };
+
+    // Create DB connection
+    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    match conn.execute(
+        "INSERT INTO history (id, client, vehicle, concept, kilometrage, total, details, pay_date) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+        params![id, order.customer, order.vehicle, order.concept, order.kilometrage, order.total, details_json, date]) 
+    {
+        Ok(_) => Ok("Order moved to history successfully".to_string()),
+        Err(_) => Err("Error writing history".to_string()),
     }
 }
