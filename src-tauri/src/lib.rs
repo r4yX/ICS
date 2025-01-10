@@ -27,7 +27,7 @@ fn create_budget(id: &str, date: &str, customer: &str, vehicle: &str, concept: &
 }
 #[tauri::command]
 fn create_order(id: &str, paid: f32) -> Result<(), String> {
-    match read_budget("1") {
+    match read_budget(id) {
         Ok(budget) => {
                 let _ = insert_order(
                     id, &budget.customer, &budget.vehicle, &budget.concept,
@@ -35,6 +35,16 @@ fn create_order(id: &str, paid: f32) -> Result<(), String> {
                 );
             Ok(())
             }
+        Err(e) => Err(format!("Error: {}", e)),
+    }
+}
+#[tauri::command]
+fn create_history(id: &str) -> Result<(), String> {
+    match read_order(id) {
+        Ok(order) => {
+            let _ = insert_history(id, order, "date");
+            Ok(())
+        }
         Err(e) => Err(format!("Error: {}", e)),
     }
 }
@@ -68,7 +78,7 @@ fn create_payment(name: &str, dni: &str, date: &str, amount: f32) -> Result<Stri
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item, create_order, create_worker])
+        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item, create_order, create_worker, create_payment, create_history])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
