@@ -1,6 +1,7 @@
 mod database;
 use database::*;
 use serde::{Serialize, Deserialize};
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Detail {
@@ -10,20 +11,19 @@ struct Detail {
     cant: u8,
     tipo: String,
     subtotal: f32,
-    iva: u8,
+    iva: f32,
     total: f32
 }
 
 #[tauri::command]
-fn create_budget(id: &str, date: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, details: &str) {
+fn create_budget(id: &str, date: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, details: Vec<Detail>) {
    insert_budget(id, customer, vehicle, concept, kilometrage, total).unwrap();
 
-   let details: Vec<Detail> = serde_json::from_str(details).expect("Error al deserializar");
    for detail in details.iter() {
        let _ = insert_detail(id, &detail.item, detail.price, detail.cant, &detail.tipo, detail.subtotal, detail.iva, detail.total);
    }
    // Add to balance
-   update_balance(date, "Ingreso", total, &format!("{} - {}", customer, concept)).unwrap();
+   //update_balance(date, "Ingreso", total, &format!("{} - {}", customer, concept)).unwrap();
 }
 #[tauri::command]
 fn create_order(id: &str, paid: f32) -> Result<(), String> {
@@ -74,11 +74,19 @@ fn create_payment(name: &str, dni: &str, date: &str, amount: f32) -> Result<Stri
     Ok(res)
 }
 
+// Read database
+#[tauri::command]
+fn obtain_budgets() -> Result<Vec<HashMap<String, String>>, String> {
+    let res = database::read_all_budgets()?;
+    Ok(res)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item, create_order, create_worker, create_payment, create_history])
+        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item, create_order, create_worker, 
+            create_payment, create_history, obtain_budgets])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

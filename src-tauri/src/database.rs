@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use rusqlite::{params, Connection, Result};
+use serde::{Serialize, Deserialize};
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Budget {
     // is stupid return 'id' field
     pub customer: String,
@@ -18,7 +20,7 @@ pub struct Order {
     pub paid: f32,
 }
 pub fn insert_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) -> Result<()> {
-    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
+    let conn = Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db")?;
     conn.execute(
         "INSERT INTO budgets (id, client, vehicle, concept, kilometrage, total) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
         params![id, customer, vehicle, concept, kilometrage, total],
@@ -78,12 +80,59 @@ pub fn insert_order(id: &str, client: &str, vehicle: &str, concept: &str, kilome
     )?;
     Ok(())
 }
-pub fn read_budget(id: &str) -> Result<Budget, String> {
-    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+pub fn read_all_budgets() -> Result<Vec<HashMap<String, String>>, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
-    let mut stmt = match conn.prepare("SELECT * FROM budget WHERE id=?") {
+    let mut stmt = match conn.prepare("SELECT * FROM budgets") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+    let budgets_iter = match stmt.query_map([], |row| {
+        let mut map = HashMap::new();
+        let id: String = row.get(0)?;
+        let client: String = row.get(1)?;
+        let vehicle: String = row.get(2)?;
+        let concept: String = row.get(3)?;
+
+        // Convertir 'kilometrage' correctamente, manejando 'REAL' como f32
+        let kilometrage: f32 = row.get(4)?;  // Asegúrate de que la columna 'kilometrage' sea un f32
+        let total: f32 = row.get(5)?;  // Asumiendo que 'total' también es un f32
+
+        // Insertar los valores en el HashMap
+        map.insert("id".to_string(), id);
+        map.insert("client".to_string(), client);
+        map.insert("vehicle".to_string(), vehicle);
+        map.insert("concept".to_string(), concept);
+        map.insert("kilometrage".to_string(), kilometrage.to_string());  // Convertir a string si es necesario
+        map.insert("total".to_string(), total.to_string());  // Convertir a string si es necesario
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
+    };
+
+    let mut budgets: Vec<HashMap<String, String>> = Vec::new();
+
+    for budget in budgets_iter {
+        match budget {
+            Ok(b) => { 
+                println!("Processed budget: {:?}", b);
+                budgets.push(b)},
+            Err(e) => {
+                println!("Error processing row");
+                return Err(format!("Failed to process row {}", e).to_string())},
+        }
+    };
+    Ok(budgets)
+} 
+pub fn read_budget(id: &str) -> Result<Budget, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM budgets WHERE id=?") {
         Ok(stmt) => stmt,
         Err(_) => return Err("Failed to prepare SQL statement".to_string()),
     };
@@ -161,8 +210,8 @@ pub fn read_details(id: &str) -> Result<Vec<HashMap<String, String>>, String>{
 
     Ok(details)
 }
-pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, subtotal: f32, iva: u8, total: f32) -> Result<String, String> {
-    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, subtotal: f32, iva: f32, total: f32) -> Result<String, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
