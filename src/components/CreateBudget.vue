@@ -2,7 +2,7 @@
   <div id="blur" :class="{ hidden: !isBudget }">
   <div id="create-budget" :class="{ hidden: !isBudget }">
 		<button @click="toggleBudget()" id="cancel" title="Cancelar"><svg-icon type="mdi" :path="mdiClose" /></button>
-    <h2 id="budget-number">N° 0001-0000001</h2>
+    <input id="budget-number" v-model="id" placeholder="0001-0000001"></input>
 		<form id="budget-form">
 			<div class="rows">
 				<div class="in-row">
@@ -11,8 +11,7 @@
 						id="customer"
 						v-model="customer"
 						:options="[
-							{ label: 'A Wizard of Earthsea', value: 'wizard_earthsea' },
-							{ label: 'The Lord of the Rings', value: 'the_lord_of_the_rings' },
+							{ label: 'Fulano de tal', value: 'fulano de tal' },
 						]" placeholder="Nombre Apellido"/>
 				</div>
 				<div class="in-row">
@@ -21,8 +20,8 @@
 						id="vehicle"
 						v-model="vehicle"
 						:options="[
-							{ label: 'A Wizard of Earthsea', value: 'wizard_earthsea' },
-							{ label: 'The Lord of the Rings', value: 'the_lord_of_the_rings' },
+							{ label: 'ABC123', value: 'ABC123' },
+							{ label: 'ZZZ000', value: 'ZZZ000' },
 						]" placeholder="ABC123"/>
 				</div>
 			</div>
@@ -42,8 +41,8 @@
 						]" placeholder="Reparación"/>
 				</div>
 				<div class="in-row">
-					<label id="kilometrage">Kilometraje</label>
-					<input id="kilometrage" type="text" pattern="\d*" placeholder="Km">
+					<label for="kilometrage">Kilometraje</label>
+					<input id="kilometrage" v-model="kilometrage" type="text" pattern="\d*" placeholder="Km">
 				</div>
 			</div>
       <div id="table">
@@ -64,8 +63,7 @@
 				<VueSelect class="vue-select"
 					id="tipo"
 					v-model="tipo"
-					:options="[{label: 'Producto', value: 'prudoduct'},
-						{label: 'Servicio', value: 'service'}]"
+					:options="[{label: 'Producto', value: 'product'}, {label: 'Servicio', value: 'service'}]"
 					placeholder="Producto o Servicio"
 				/>
 				<input id="iva" v-model="iva" placeholder="21" pattern="\d*"></input>
@@ -94,25 +92,36 @@
 </template>
 
 <script>
-import { ref } from 'vue';                
+import { invoke } from '@tauri-apps/api/core';
+import { ref, watch } from 'vue';                
 import VueSelect from "vue3-select-component";
+
+import Item from "../components/Item.vue";
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiClose, mdiPlus, mdiCheck } from '@mdi/js';
-import Item from "../components/Item.vue";
 
+const isBudget = ref(true);
+// Form fields
 const customer = ref("");
 const vehicle = ref("");
 const concept = ref("");
-const kilometrage = ref("");
+const kilometrage = ref(0.0);
 const details = ref([]);
-
+// details fields
+const id = ref();
 const item = ref("");
-const price = ref(0);
+const price = ref(0.0);
 const cant = ref(0);
 const tipo = ref("");
-const iva = ref(0);
+const iva = ref(0.0);
 
 export default {
+	name: 'CreateBudget',
+	components: {
+		SvgIcon,
+		VueSelect,
+		Item,
+	},
 	methods: {
 		toggleBudget() {
 			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
@@ -120,30 +129,58 @@ export default {
 			this.$emit('destroy');
 		}
 	},
-	name: 'CreateBudget',
-	components: {
-		SvgIcon,
-		VueSelect,
-		Item,
-	},
-	setup() {
-    const isBudget = ref(true);
-		const createBudget = () => {}
+	setup(props, { emit }) {
+		const createBudget = async() => {
+			// Get actual date
+			const today = new Date();
+			const formattedDate = today.toLocaleDateString('en-GB');
+
+			// Get total amount of the detail
+			let amount = details.value.reduce((accumulator, currentValue) => {
+        return accumulator + currentValue.total;
+      }, 0);
+			amount = parseFloat(amount)
+
+			await invoke('create_budget', {
+				id: id.value, date: formattedDate, customer: customer.value, vehicle: vehicle.value,
+				concept: concept.value, kilometrage: parseFloat(kilometrage.value), total: amount,
+				details: details.value
+			})
+
+			// Notify father 
+			emit('refresh-budgets');
+			emit('destroy');
+		}
+
+		// Check when change id of budget
+    let timeout = null;
+    const handleInputChange = () => {
+      clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        //TO-DO: check if id is available;
+      }, 400);
+    };
+
+    watch(id, handleInputChange);
 
 		const delDetail = (index) => {details.value.splice(index, 1);};
 
 		const addDetail = () => {
+			// Parse Values
 			let stotal = price.value*cant.value;
-			let ivaPrice = stotal*iva.value/100
-			let total = stotal+ivaPrice;
+			let ivaPrice = parseFloat(stotal*iva.value/100);
+			let total = parseFloat(stotal+ivaPrice);
+
 			details.value.push({
+				id: id.value,
 				item: item.value,
-				price: price.value,
-				cant: cant.value,
+				price: parseFloat(price.value),
+				cant: parseInt(cant.value),
 				tipo: tipo.value,
-				stotal,
+				subtotal: stotal,
 				iva: ivaPrice,
-				total});
+				total: total});
 		};
 
 		addEventListener('keydown', (e) => {
@@ -152,10 +189,10 @@ export default {
 				cancelBtn.click()
 			}
 		})
-    // -- Return
 		return {
 			isBudget,
 			// Input vars
+			id,
 			customer,
 			vehicle,
 			concept,
@@ -168,16 +205,14 @@ export default {
 			delDetail,
 			createBudget,
 			// Icons
-			mdiClose,
-			mdiPlus,
-			mdiCheck
+			mdiClose,	mdiPlus, mdiCheck
 		};
 	},
 };
 </script>
 
 <style scoped>
-/* --  Create budget box  -- */
+/* --  Budget PopUp  -- */
 #blur {
   position: absolute;
   top: 0;
@@ -245,9 +280,6 @@ export default {
 #create-budget.hidden {
   display: none;
 }
-#create-budget.test {
-  background-color: red;
-}
 #budget-form {
 	height: 78%;
   width: 90%;
@@ -257,15 +289,16 @@ export default {
 	overflow-y: scroll;
 	overflow-x: scroll;	
 }
-#budget-form input {
+input {
 	background: #333;
 	border: none;
 	border-radius: .4rem;
 	padding: 6px 0.5rem;
 	font-size: 18px;
 	font-weight: 400;
+	color: #111;
 }
-#budget-form input::placeholder {
+input::placeholder {
 	color: #52525b;
 }
 .rows {
@@ -283,15 +316,15 @@ export default {
 .in-row > label {
   margin: 0 0 .4rem 0;
 }
-/* --  Table  -- */
+/* --  Details  -- */
 #table {
-	width: 95%;
+	width: 98%;
 	margin: 0;
 	margin-top: 2rem;
 	align-items: center;
 	display: grid;
 	gap: 10px;
-	grid-template-columns: 15rem 5rem 3rem 12rem 3rem 1.8rem;
+	grid-template-columns: 17.4rem 5rem 3rem 12rem 3rem 1.8rem;
 }
 #price, #stotal {width: 4.2rem;}
 
@@ -322,7 +355,7 @@ export default {
 	width: 98%;
 	display: grid;
 	gap: 10px;
-	grid-template-columns: auto auto auto 110px 130px auto auto auto;
+	grid-template-columns: auto auto auto 110px 130px 85px auto auto;
 	justify-content: start;
 	align-items: center;
 }
