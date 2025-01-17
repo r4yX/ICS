@@ -4,7 +4,7 @@
 		<p title="Precio">${{ detail.price }}</p>
 		<p title="Cantidad">{{ detail.cant }}</p>
 		<p title="Tipo">{{ detail.tipo }}</p>
-		<p title="SubTotal">${{ detail.stotal }}</p>
+		<p title="SubTotal">${{ detail.subtotal }}</p>
 		<p title="IVA ($)">${{ detail.iva }}</p>
 		<p title="Total">${{ detail.total }}</p>
 		<button id="del-btn" @click="delDetail(index)" type="button">
@@ -47,7 +47,7 @@ export default {
 	width: 96%;
 	display: grid;
 	gap: 10px;
-	grid-template-columns: 60px 74px 50px 120px 120px 52px 54px auto;
+	grid-template-columns: 60px 88px 55px 120px 120px 88px 64px auto;
 	justify-content: start;
 	align-items: center;
 }

@@ -4,15 +4,25 @@
       <h2>Presupuestos</h2>
 			<button @click="toggleBudget()" title="Crear Presupuesto"><svg-icon type="mdi" :path="mdiPlus" /></button>
     </div>
-		<component :is="budgetComponent" @destroy="budgetComponent = null"/>
+		<component :is="budgetComponent" @destroy="budgetComponent = null" @refresh-budgets="updateBudgets"/>
     <ul>
-      <p>Presupuestos</p>
+			<li v-for="(budget, index) in budgets" :key="index">
+        <strong>{{ budget.customer }}</strong> - {{ budget.vehicle }} - {{ budget.concept }} - {{ budget.kilometrage }} km - ${{ budget.total }}
+      </li>
+		<!-- <Budget
+        v-for="(budgets, index) in details"
+        :key="index"
+        :detail="detail"
+        :index="index"
+        :delDetail="delDetail"
+				/>-->
     </ul>
   </div>
 </template>
 
 <script>                                           
-import { ref } from 'vue';                
+import { ref, onMounted, shallowRef } from 'vue';                
+import { invoke } from "@tauri-apps/api/core";
 import CreateBudget from "../components/CreateBudget.vue";
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiPlus } from "@mdi/js";
@@ -21,7 +31,8 @@ export default {
 	name: 'Budgets',
 	components: {CreateBudget, SvgIcon},
 	setup() {
-		const budgetComponent = ref(null);
+		const budgets = ref([]);
+		const budgetComponent = shallowRef(null);
 
 		const toggleBudget = () => {
 			if (!budgetComponent.value) {
@@ -30,10 +41,27 @@ export default {
         budgetComponent.value = null;
       }
 		};
+		const updateBudgets = async() => {
+      try {
+        const result = await invoke('obtain_budgets');
+        budgets.value = result.map((budget) => ({
+          customer: budget.customer,
+          vehicle: budget.vehicle,
+          concept: budget.concept,
+          kilometrage: budget.kilometrage,
+          total: budget.total,
+        }));
+      } catch (error) {
+        console.error('Error al cargar presupuestos:', error);
+      }
+    }
+    onMounted(updateBudgets);
 	return {
 		toggleBudget,
 		budgetComponent,
 		mdiPlus,
+		budgets,
+		updateBudgets
 	};                                             
 },
 };
