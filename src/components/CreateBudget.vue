@@ -220,6 +220,7 @@ export default {
   width: 100%;
   height: 100%;
   background-color: #0005;
+	z-index: 90;
 }
 #blur.hidden {
   display: none;
@@ -241,6 +242,7 @@ export default {
   background-color: #202020;
   border: 2px solid #444;
   border-radius: 9px;
+	z-index: 100;
 }
 #create-budget > button {
   position: absolute;
