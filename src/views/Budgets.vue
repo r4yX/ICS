@@ -6,16 +6,12 @@
     </div>
 		<component :is="budgetComponent" @destroy="budgetComponent = null" @refresh-budgets="updateBudgets"/>
     <ul>
-			<li v-for="(budget, index) in budgets" :key="index">
-        <strong>{{ budget.customer }}</strong> - {{ budget.vehicle }} - {{ budget.concept }} - {{ budget.kilometrage }} km - ${{ budget.total }}
-      </li>
-		<!-- <Budget
-        v-for="(budgets, index) in details"
+		<Budget
+        v-for="(budget, index) in budgets"
         :key="index"
-        :detail="detail"
+        :data="budget"
         :index="index"
-        :delDetail="delDetail"
-				/>-->
+				/>
     </ul>
   </div>
 </template>
@@ -23,13 +19,14 @@
 <script>                                           
 import { ref, onMounted, shallowRef } from 'vue';                
 import { invoke } from "@tauri-apps/api/core";
-import CreateBudget from "../components/CreateBudget.vue";
+import CreateBudget from "@components/CreateBudget.vue";
+import Budget from "@components/Budget.vue"
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiPlus } from "@mdi/js";
 
 export default {
 	name: 'Budgets',
-	components: {CreateBudget, SvgIcon},
+	components: {CreateBudget, Budget, SvgIcon},
 	setup() {
 		const budgets = ref([]);
 		const budgetComponent = shallowRef(null);
@@ -45,11 +42,14 @@ export default {
       try {
         const result = await invoke('obtain_budgets');
         budgets.value = result.map((budget) => ({
+					id: budget.id,
           customer: budget.customer,
           vehicle: budget.vehicle,
           concept: budget.concept,
           kilometrage: budget.kilometrage,
           total: budget.total,
+					paid: "none",
+					pay_date: "none",
         }));
       } catch (error) {
         console.error('Error al cargar presupuestos:', error);
@@ -73,6 +73,7 @@ export default {
   flex-direction: column;
 	background: #222;
 	color: #ddd;
+	overflow-y: scroll;
 }
 #header {
   display: flex;
