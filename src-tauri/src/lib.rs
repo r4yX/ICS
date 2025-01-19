@@ -80,13 +80,18 @@ fn obtain_budgets() -> Result<Vec<HashMap<String, String>>, String> {
     let res = database::read_all_budgets()?;
     Ok(res)
 }
+#[tauri::command]
+fn obtain_details(id: &str) -> Result<Vec<HashMap<String, String>>, String> {
+    let res = database::read_all_details(id)?;
+    Ok(res)
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item, create_order, create_worker, 
-            create_payment, create_history, obtain_budgets])
+            create_payment, create_history, obtain_budgets, obtain_details])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -92,7 +92,7 @@ pub fn read_all_budgets() -> Result<Vec<HashMap<String, String>>, String> {
     let budgets_iter = match stmt.query_map([], |row| {
         let mut map = HashMap::new();
         let id: String = row.get(0)?;
-        let client: String = row.get(1)?;
+        let customer: String = row.get(1)?;
         let vehicle: String = row.get(2)?;
         let concept: String = row.get(3)?;
 
@@ -102,7 +102,7 @@ pub fn read_all_budgets() -> Result<Vec<HashMap<String, String>>, String> {
 
         // Insertar los valores en el HashMap
         map.insert("id".to_string(), id);
-        map.insert("client".to_string(), client);
+        map.insert("customer".to_string(), customer);
         map.insert("vehicle".to_string(), vehicle);
         map.insert("concept".to_string(), concept);
         map.insert("kilometrage".to_string(), kilometrage.to_string());  // Convertir a string si es necesario
@@ -126,6 +126,54 @@ pub fn read_all_budgets() -> Result<Vec<HashMap<String, String>>, String> {
         }
     };
     Ok(budgets)
+} 
+pub fn read_all_details(id: &str) -> Result<Vec<HashMap<String, String>>, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM details WHERE id=?1") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+    let details_iter = match stmt.query_map([id], |row| {
+        let mut map = HashMap::new();
+        let _: String = row.get(0)?;
+        let item: String = row.get(1)?;
+        let tipo: String = row.get(4)?;
+
+        // Convertir 'kilometrage' correctamente, manejando 'REAL' como f32
+        let price: f32 = row.get(2)?;
+        let cant: u8 = row.get(3)?;
+        let subtotal: f32 = row.get(5)?;
+        let iva: f32 = row.get(6)?;
+        let total: f32 = row.get(7)?;
+
+        // Insertar los valores en el HashMap
+        map.insert("item".to_string(), item);
+        map.insert("price".to_string(), price.to_string());
+        map.insert("cant".to_string(), cant.to_string());
+        map.insert("tipo".to_string(), tipo.to_string());
+        map.insert("subtotal".to_string(), subtotal.to_string());
+        map.insert("iva".to_string(), iva.to_string());
+        map.insert("total".to_string(), total.to_string());
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
+    };
+
+    let mut details: Vec<HashMap<String, String>> = Vec::new();
+
+    for detail in details_iter {
+        match detail {
+            Ok(b) => { 
+                details.push(b)},
+            Err(e) => {
+                return Err(format!("Failed to process row {}", e).to_string())},
+        }
+    };
+    Ok(details)
 } 
 pub fn read_budget(id: &str) -> Result<Budget, String> {
     let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
