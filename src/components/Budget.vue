@@ -92,7 +92,7 @@ export default {
 
 		// History Funtion (History.vue)
 		const deleteHistory = async() => {
-			console.log(props.data.id)
+			console.log(props.data)
 		}
 
 		return {
