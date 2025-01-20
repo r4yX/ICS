@@ -56,14 +56,14 @@ export default {
       }
     }
     onMounted(updateBudgets);
-	return {
-		toggleBudget,
-		budgetComponent,
-		mdiPlus,
-		budgets,
-		updateBudgets
-	};                                             
-},
+		return {
+			toggleBudget,
+			budgetComponent,
+			mdiPlus,
+			budgets,
+			updateBudgets
+		};                                             
+	},
 };
 </script>
 

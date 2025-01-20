@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Budgets from './views/Budgets.vue';
-import Works from './views/Works.vue';
+import Orders from './views/Orders.vue';
 import History from './views/History.vue'; 
 import Customers from './views/Customers.vue'; 
 import Vehicles from './views/Vehicles.vue'; 
@@ -11,7 +11,7 @@ import Config from './views/Config.vue';
 
 const routes = [
   { path: '/', name: 'budgets', component: Budgets },
-  { path: '/works', name: 'works', component: Works },
+  { path: '/orders', name: 'orders', component: Orders },
   { path: '/history', name: 'history', component: History },
   { path: '/customers', name: 'customers', component: Customers },
   { path: '/vehicles', name: 'vehicles', component: Vehicles },
