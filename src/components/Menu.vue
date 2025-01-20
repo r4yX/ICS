@@ -3,7 +3,7 @@
 		<button id="toggle-menu" @click="toggleMenu()"><svg-icon type="mdi" :path="mdiChevronLeft" /></button>
     <ul>
 			<button @click="navigateTo('budgets')"><svg-icon type="mdi" :path="mdiNoteText"></svg-icon><p>Presupuesto</p></button>
-			<button @click="navigateTo('works')"><svg-icon type="mdi" :path="mdiNoteCheck"></svg-icon><p>Orden de Trabajo</p></button>
+			<button @click="navigateTo('orders')"><svg-icon type="mdi" :path="mdiNoteCheck"></svg-icon><p>Orden de Trabajo</p></button>
       <button @click="navigateTo('history')"><svg-icon type="mdi" :path="mdiClock"></svg-icon><p>Historico</p></button>
       <hr>
       <button @click="navigateTo('customers')"><svg-icon type="mdi" :path="mdiAccount"></svg-icon><p>Clientes</p></button>
