@@ -6,6 +6,8 @@
 			<p title="Patente"><svg-icon type="mdi" :path="mdiCar"/>{{ data.vehicle }}</p>
 			<p title="Total"><svg-icon type="mdi" :path="mdiCurrencyUsd"/>{{ data.total }}</p>
 			<p title="Kilometraje"><svg-icon type="mdi" :path="mdiRoadVariant"/>{{ data.kilometrage }}</p>
+			<p v-if="data.paid != 'none'" title="Pagado"><svg-icon type="mdi" :path="mdiCashCheck"/>{{ data.paid }}</p>
+			<p v-if="data.pay_date != 'none'" title="Fecha de pago"><svg-icon type="mdi" :path="mdiCashRegister"/>{{ data.pay_date }}</p>
 		</div>
 		 <table v-if="details && details.length > 0">
 			 <tbody>
@@ -27,7 +29,9 @@
 				 </tr>
 			 </tbody>
 		 </table>
-		<button title="Aprobar Presupuesto" id="checkBtn" @click="create "><svg-icon type="mdi" :path="mdiCheck"/></button>
+		<button v-if="data.paid == 'none'" title="Aprobar Presupuesto" id="checkBtn" @click="createBudget()"><svg-icon type="mdi" :path="mdiCheck"/></button>
+		<button v-if="data.paid != 'none' && data.pay_date == 'none'" title="Acreditar pago" id="checkBtn" @click="payOrder()"><svg-icon type="mdi" :path="mdiCashPlus"/></button>
+		<button v-if="data.pay_date != 'none'" title="Eliminar del historial" id="checkBtn" @click="deleteHistory()"><svg-icon type="mdi" :path="mdiClockMinus"/></button>
 	</div>
 </template>
 
@@ -35,8 +39,7 @@
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import SvgIcon from '@jamescoyle/vue-icon';
-import { mdiAccount, mdiCar, mdiHelpCircle, mdiRoadVariant, mdiArrowExpandDown, mdiArrowCollapseUp,
-				mdiCheck, mdiCurrencyUsd} from '@mdi/js';
+import { mdiAccount, mdiCar, mdiHelpCircle, mdiRoadVariant, mdiArrowExpandDown, mdiArrowCollapseUp,	mdiCheck, mdiCurrencyUsd, mdiCashCheck, mdiCashPlus, mdiClockMinus, mdiCashRegister} from '@mdi/js';
 
 export default {
 	props: {
@@ -52,7 +55,6 @@ export default {
 		const details = ref()
 		const toggleCard = async(e) => {
 			details.value = await invoke('obtain_details', {'id': props.data.id})
-			console.log(details.value)
 
 			let cardParent = e.target.parentElement;
 			while (cardParent.tagName.toLowerCase() != 'div') {
@@ -60,16 +62,49 @@ export default {
 			}
 			cardParent.classList.toggle('closed');
 		};
-		const downloadPDF = () => {
+		// Budget Function (Budgets.vue)
+		const createBudget = async() => {
+			let paid = parseInt(prompt("El cliente ha pagado ($):", "0"))
+			let log = await invoke('create_order', {'id': props.data.id, 'paid': paid})
+			alert(log)
+		}
+
+		// Order Function (Orders.vue)
+		const payOrder = async() => {
+			let pay = parseInt(prompt("El cliente ha pagado ($):", "0"))
+			let paid = parseInt(props.data.paid)
+			// If customer paid total of cost
+			if (props.data.total == pay+paid) {
+				let now = new Date();
+				let pay_date = now.toLocaleString('en-CA', {
+					hour12: false, month: '2-digit', day: '2-digit', year: 'numeric',
+					hour: '2-digit', minute: '2-digit', second: '2-digit'});
+				pay_date = pay_date.replace(',', '')
+
+				let log = await invoke('create_history', {'id': props.data.id, 'payDate': pay_date})
+				alert(log)
+			} else {
+				console.log('menor a la deuda');
+				let log = await invoke('pay_order', {'id': props.data.id, 'paid': paid+pay})
+				alert(log)
+			}
+		}
+
+		// History Funtion (History.vue)
+		const deleteHistory = async() => {
+			console.log(props.data.id)
 		}
 
 		return {
 			details,
 			toggleCard,
-			downloadPDF,
+			createBudget,
+			payOrder,
+			deleteHistory,
 			// Icons
 			mdiAccount, mdiCar, mdiHelpCircle, mdiRoadVariant,
-			mdiArrowExpandDown, mdiCheck, mdiCurrencyUsd,
+			mdiArrowExpandDown, mdiCheck, mdiCurrencyUsd, mdiCashCheck,
+			mdiCashPlus, mdiClockMinus, mdiCashRegister
 		}
 	},
 };
