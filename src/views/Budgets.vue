@@ -11,6 +11,7 @@
         :key="index"
         :data="budget"
         :index="index"
+				@refresh-budgets="updateBudgets"
 				/>
     </ul>
   </div>

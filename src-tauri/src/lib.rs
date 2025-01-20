@@ -35,8 +35,12 @@ fn create_order(id: &str, paid: f32) -> Result<String, String> {
         id, &budget.customer, &budget.vehicle, &budget.concept,
         budget.kilometrage, budget.total, paid
     ) {
-        Ok(_) => Ok(format!("Order {} created successfully", id)),
-        Err(e) => Err(format!("Error: {}", e)),
+        Ok(_) => "Order inserted".to_string(),
+        Err(e) => return Err(format!("Error: {}", e)),
+    };
+    match delete_budget(id) {
+        Ok(_) => Ok(format!("Budget {} is approved.", id)),
+        Err(e) => Err(format!("Err ({}) deleting {} budget", e, id))
     }
 }
 #[tauri::command]

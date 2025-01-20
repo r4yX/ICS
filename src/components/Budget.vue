@@ -51,7 +51,7 @@ export default {
 	components: {
 		SvgIcon,
 	},
-	setup(props) {
+	setup(props, { emit }) {
 		const details = ref()
 		const toggleCard = async(e) => {
 			details.value = await invoke('obtain_details', {'id': props.data.id})
@@ -67,6 +67,7 @@ export default {
 			let paid = parseInt(prompt("El cliente ha pagado ($):", "0"))
 			let log = await invoke('create_order', {'id': props.data.id, 'paid': paid})
 			alert(log)
+			emit('refresh-budgets');
 		}
 
 		// Order Function (Orders.vue)
