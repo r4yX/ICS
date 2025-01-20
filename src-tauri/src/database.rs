@@ -72,13 +72,31 @@ pub fn update_balance(date: &str, tipo: &str, amount: f32, name: &str) -> Result
         Err(_) => Err("Error updating balance".to_string())
     }
 }
-pub fn insert_order(id: &str, client: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, paid: f32) -> Result<()> {
-    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
-    conn.execute(
-        "INSERT INTO orders (id, client, vehicle, concept, kilometrage, total, paid) VALUES (?1, ?2, ?3, ?4)",
+pub fn update_order(id: &str, paid: f32) -> Result<String, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    match conn.execute(
+        "UPDATE orders SET paid=?1 WHERE id=?2",
+        params![paid, id],
+    ) {
+        Ok(_) => Ok(format!("Order {} updated successfully", id)),
+        Err(e) => Err(format!("Err: ({}) updating order {}", e, id)),
+    }
+}
+pub fn insert_order(id: &str, client: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, paid: f32) -> Result<String, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    match conn.execute(
+        "INSERT INTO orders (id, client, vehicle, concept, kilometrage, total, paid) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
         params![id, client, vehicle, concept, kilometrage, total, paid],
-    )?;
-    Ok(())
+    ) {
+        Ok(_) => Ok(format!("order {} created successfully", id)),
+        Err(_) => Err(format!("Error creating order {}", id)),
+    }
 }
 pub fn read_all_budgets() -> Result<Vec<HashMap<String, String>>, String> {
     let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
@@ -95,18 +113,16 @@ pub fn read_all_budgets() -> Result<Vec<HashMap<String, String>>, String> {
         let customer: String = row.get(1)?;
         let vehicle: String = row.get(2)?;
         let concept: String = row.get(3)?;
+        let kilometrage: f32 = row.get(4)?;
+        let total: f32 = row.get(5)?;
 
-        // Convertir 'kilometrage' correctamente, manejando 'REAL' como f32
-        let kilometrage: f32 = row.get(4)?;  // Asegúrate de que la columna 'kilometrage' sea un f32
-        let total: f32 = row.get(5)?;  // Asumiendo que 'total' también es un f32
-
-        // Insertar los valores en el HashMap
+        // Insert values in the HashMap
         map.insert("id".to_string(), id);
         map.insert("customer".to_string(), customer);
         map.insert("vehicle".to_string(), vehicle);
         map.insert("concept".to_string(), concept);
-        map.insert("kilometrage".to_string(), kilometrage.to_string());  // Convertir a string si es necesario
-        map.insert("total".to_string(), total.to_string());  // Convertir a string si es necesario
+        map.insert("kilometrage".to_string(), kilometrage.to_string());
+        map.insert("total".to_string(), total.to_string());
         Ok(map)
     }) {
         Ok(iter) => iter,
@@ -118,14 +134,57 @@ pub fn read_all_budgets() -> Result<Vec<HashMap<String, String>>, String> {
     for budget in budgets_iter {
         match budget {
             Ok(b) => { 
-                println!("Processed budget: {:?}", b);
                 budgets.push(b)},
             Err(e) => {
-                println!("Error processing row");
                 return Err(format!("Failed to process row {}", e).to_string())},
         }
     };
     Ok(budgets)
+} 
+pub fn read_all_orders() -> Result<Vec<HashMap<String, String>>, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM orders") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+    let orders_iter = match stmt.query_map([], |row| {
+        let mut map = HashMap::new();
+        let id: String = row.get(0)?;
+        let customer: String = row.get(1)?;
+        let vehicle: String = row.get(2)?;
+        let concept: String = row.get(3)?;
+        let kilometrage: f32 = row.get(4)?;
+        let total: f32 = row.get(5)?;
+        let paid: f32 = row.get(6)?;
+
+        // Insert values in the HashMap
+        map.insert("id".to_string(), id);
+        map.insert("customer".to_string(), customer);
+        map.insert("vehicle".to_string(), vehicle);
+        map.insert("concept".to_string(), concept);
+        map.insert("kilometrage".to_string(), kilometrage.to_string());
+        map.insert("total".to_string(), total.to_string());
+        map.insert("paid".to_string(), paid.to_string());
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
+    };
+
+    let mut orders: Vec<HashMap<String, String>> = Vec::new();
+
+    for order in orders_iter {
+        match order {
+            Ok(b) => { 
+                orders.push(b)},
+            Err(e) => {
+                return Err(format!("Failed to process row {}", e).to_string())},
+        }
+    };
+    Ok(orders)
 } 
 pub fn read_all_details(id: &str) -> Result<Vec<HashMap<String, String>>, String> {
     let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
@@ -200,7 +259,7 @@ pub fn read_budget(id: &str) -> Result<Budget, String> {
     }
 }
 pub fn read_order(id: &str) -> Result<Order, String> {
-    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -224,7 +283,7 @@ pub fn read_order(id: &str) -> Result<Order, String> {
     }
 }
 pub fn read_details(id: &str) -> Result<Vec<HashMap<String, String>>, String>{
-    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -234,14 +293,25 @@ pub fn read_details(id: &str) -> Result<Vec<HashMap<String, String>>, String>{
     };
     let details_iter = match stmt.query_map([id], |row| {
         let mut map = HashMap::new();
-        map.insert("id".to_string(), row.get(0)?);
-        map.insert("item".to_string(), row.get(1)?);
-        map.insert("price".to_string(), row.get(2)?);
-        map.insert("cant".to_string(), row.get(3)?);
-        map.insert("tipo".to_string(), row.get(4)?);
-        map.insert("subtotal".to_string(), row.get(5)?);
-        map.insert("iva".to_string(), row.get(6)?);
-        map.insert("total".to_string(), row.get(7)?);
+
+        let _: String = row.get(0)?;
+        let item: String = row.get(1)?;
+        let tipo: String = row.get(4)?;
+
+        // Manage numeric rows
+        let price: f32 = row.get(2)?;
+        let cant: u8 = row.get(3)?;
+        let subtotal: f32 = row.get(5)?;
+        let iva: f32 = row.get(6)?;
+        let total: f32 = row.get(7)?;
+
+        map.insert("item".to_string(), item);
+        map.insert("price".to_string(), price.to_string());
+        map.insert("cant".to_string(), cant.to_string());
+        map.insert("tipo".to_string(), tipo.to_string());
+        map.insert("subtotal".to_string(), subtotal.to_string());
+        map.insert("iva".to_string(), iva.to_string());
+        map.insert("total".to_string(), total.to_string());
         Ok(map)
     }) {
         Ok(iter) => iter,
@@ -301,7 +371,7 @@ pub fn insert_history(id: &str, order: Order, date: &str) -> Result<String, Stri
     // Get details with the order id
     let details = match read_details(id) {
         Ok(details) => details,
-        Err(_) => return Err("Error obtaining details".to_string()),
+        Err(e) => return Err(format!("Err ({}) obtaining details. id: {}", e, id)),
     };
     let details_json = match serde_json::to_string(&details) {
         Ok(json) => json,
@@ -309,7 +379,7 @@ pub fn insert_history(id: &str, order: Order, date: &str) -> Result<String, Stri
     };
 
     // Create DB connection
-    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -318,6 +388,21 @@ pub fn insert_history(id: &str, order: Order, date: &str) -> Result<String, Stri
         params![id, order.customer, order.vehicle, order.concept, order.kilometrage, order.total, details_json, date]) 
     {
         Ok(_) => Ok("Order moved to history successfully".to_string()),
-        Err(_) => Err("Error writing history".to_string()),
+        Err(e) => Err(format!("Err ({}) writing history", e)),
+    }
+}
+
+// Delete Functions
+pub fn delete_budget(id: &str) -> Result<String, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    match conn.execute(
+        "DELETE FROM budgets WHERE id=?1",
+        params![id],
+    ) {
+        Ok(_) => Ok(format!("budget {} removed successfully", id)),
+        Err(_) => Err(format!("Error deleting budget {}", id)),
     }
 }
