@@ -27,29 +27,44 @@ pub fn insert_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kil
     )?;
     Ok(())
 }
-pub fn insert_customer(name: &str, phone: &str, tipo: &str, cuit: &str, dni: &str) -> Result<()> {
-    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
-    conn.execute(
+pub fn insert_customer(name: &str, phone: &str, cuit: &str, dni: &str, tipo: &str) -> Result<String, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(e) => return Err(e.to_string()),
+    };
+    match conn.execute(
         "INSERT INTO clients (name, phone, cuil, dni, tipo) VALUES (?1, ?2, ?3, ?4, ?5)",
-        params![name, phone, tipo, cuit, dni],
-    )?;
-    Ok(())
+        params![name, phone, cuit, dni, tipo],
+    ) {
+        Ok(_) => Ok("client added successfully".to_string()),
+        Err(e) => Err(format!("Err ({})", e)),
+    }
 }
-pub fn insert_vehicles(domain: &str, maker: &str, model: &str, tipo: &str, colour: &str, year: u8, owner: &str) -> Result<()> {
-    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
-    conn.execute(
+pub fn insert_vehicle(domain: &str, maker: &str, model: &str, tipo: &str, colour: &str, year: u16, owner: &str) -> Result<String, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+        Ok(conn) => conn,
+        Err(e) => return Err(e.to_string()),
+    };
+    match conn.execute(
         "INSERT INTO vehicles (domain, maker, model, tipo, colour, year, owner) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
         params![domain, maker, model, tipo, colour, year, owner],
-    )?;
-    Ok(())
+    ) {
+        Ok(_) => Ok(format!("Vehicle {} created successfully", domain)),
+        Err(e) => Err(format!("Err ({}) creating vehicle {}", e, domain)),
+    }
 }
-pub fn update_vehicles(domain: &str, owner: &str) -> Result <()>{
-    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
-    conn.execute(
-        "UPDATE vehicles SET owner='?1' WHERE domain='?2'",
+pub fn update_vehicles(domain: &str, owner: &str) -> Result <String, String>{
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    match conn.execute(
+        "UPDATE vehicles SET owner=?1 WHERE domain=?2",
         params![owner, domain]
-    )?;
-    Ok(())
+    ) {
+        Ok(_) => Ok(format!("{} now is the owner of {}", owner, domain)),
+        Err(e) => Err(e.to_string())
+    }
 }
 pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) -> Result<()> {
     let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
@@ -281,6 +296,72 @@ pub fn read_all_details(id: &str) -> Result<Vec<HashMap<String, String>>, String
     };
     Ok(details)
 } 
+pub fn read_all_vehicles(domain: &str) -> Result<Vec<String>, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+        Ok(conn) => conn,
+        Err(e) => return Err(e.to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM vehicles") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+    let mut vehicles = Vec::new();
+
+    let rows = match stmt.query_map([], |row| row.get(0)) {
+        Ok(rows) => rows,
+        Err(e) => return Err(e.to_string()),
+    };
+
+    for row in rows {
+        let plate: String = match row {
+            Ok(row) => row,
+            Err(e) => return Err(format!("Err ({})", e)),
+        };
+        if plate.contains(domain) || domain == "none" {
+            vehicles.push(plate);
+        }
+    }
+    Ok(vehicles)
+}
+pub fn read_all_customers() -> Result<Vec<HashMap<String, String>>, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM clients") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+    let customers_iter = match stmt.query_map([], |row| {
+        let mut map = HashMap::new();
+        let name: String = row.get(0)?;
+        let phone: String = row.get(1)?;
+        let cuil: String = row.get(2)?;
+        let dni: String = row.get(3)?;
+        let tipo: String = row.get(4)?;
+
+        // Insert values in the HashMap
+        map.insert("name".to_string(), name);
+        map.insert("phone".to_string(), phone);
+        map.insert("cuil".to_string(), cuil);
+        map.insert("dni".to_string(), dni);
+        map.insert("tipo".to_string(), tipo);
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
+    };
+
+    let mut customers: Vec<HashMap<String, String>> = Vec::new();
+
+    for customer in customers_iter {
+        match customer {
+            Ok(c) => customers.push(c),
+            Err(e) => return Err(format!("Failed to process row {}", e).to_string()),
+        }
+    };
+    Ok(customers)
+}
 pub fn read_budget(id: &str) -> Result<Budget, String> {
     let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,

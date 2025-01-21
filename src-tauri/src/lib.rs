@@ -53,11 +53,19 @@ fn create_history(id: &str, pay_date: &str) -> Result<String, String> {
     Ok(res)
 }
 #[tauri::command]
-fn create_customer(name: &str, phone: &str, cuil: &str, dni: &str, tipo: &str, vehicles: Vec<&str>) {
-    let _ = database::insert_customer(name, phone, cuil, dni, tipo);
+fn create_customer(name: &str, phone: &str, cuit: &str, dni: &str, tipo: &str, vehicles: Vec<&str>) -> Result<String, String> {
     for vehicle in vehicles.iter() {
         let _ = update_vehicles(vehicle, name);
     }
+    match insert_customer(name, phone, cuit, dni, tipo) {
+        Ok(_) => Ok(format!("client {} created successfully", name)),
+        Err(e) => Err(format!("Err ({}) creating client {}", e, name)),
+    }
+}
+#[tauri::command]
+fn create_vehicle(domain: &str, maker: &str, model: &str, tipo: &str, colour: &str, year: u16, owner: &str) -> Result<String, String> {
+    let res = insert_vehicle(domain, maker, model, tipo, colour, year, owner)?;
+    Ok(res)
 }
 #[tauri::command]
 fn create_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) {
@@ -99,19 +107,29 @@ fn obtain_history() -> Result<Vec<HashMap<String, String>>, String> {
     let res = database::read_all_history()?;
     Ok(res)
 }
-
+#[tauri::command]
+fn obtain_customers() -> Result<Vec<HashMap<String, String>>, String> {
+    let res = read_all_customers()?;
+    Ok(res)
+}
 #[tauri::command]
 fn obtain_details(id: &str) -> Result<Vec<HashMap<String, String>>, String> {
     let res = database::read_all_details(id)?;
     Ok(res)
 }
-
+#[tauri::command]
+fn obtain_vehicles(plate: &str) -> Result<Vec<String>, String> {
+    let res = read_all_vehicles(plate)?;
+    Ok(res)
+}
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_item, create_order, create_worker, 
-            create_payment, create_history, obtain_budgets, obtain_orders, obtain_history, obtain_details, pay_order])
+        .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_vehicle,
+        create_item, create_order, create_worker, create_payment, create_history, obtain_budgets,
+        obtain_orders, obtain_history, obtain_details, obtain_vehicles, obtain_customers,
+        pay_order])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
