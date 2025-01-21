@@ -5,22 +5,34 @@
 			<button @click="toggleCustomer"><svg-icon type="mdi" :path="mdiPlus"/></button>
 		</div>
 		<component :is="customerComponent" @destroy="customerComponent = null"/>
+		<Client
+        v-for="(client, index) in clients"
+        :key="index"
+        :data="client"
+        :index="index"
+				@refresh-budgets="updateCustomers"
+			/>
   </div>
 </template>
 
 <script>
-import { shallowRef } from 'vue';
+import { ref, shallowRef, onMounted } from 'vue';
+import { invoke } from "@tauri-apps/api/core";
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiPlus } from '@mdi/js';
-import CreateCustomer from "../components/CreateCustomer.vue";
+import CreateCustomer from "@components/CreateCustomer.vue";
+import Client from "@components/Client.vue"
 
 export default {
   name: 'Customers',
   components: {
     SvgIcon,
-		CreateCustomer
+		CreateCustomer,
+		Client,
+		Client
   },
 	setup() {
+		const clients = ref([]);
 		const customerComponent = shallowRef(null);
 
 		const toggleCustomer = () => {
@@ -30,10 +42,19 @@ export default {
         customerComponent.value = null;
       }
 		};
+
+		const updateCustomers = async() => {
+			let log = await invoke('obtain_customers')
+			clients.value = log
+		}
+		onMounted(updateCustomers);
 		return {
 			mdiPlus,
-			toggleCustomer,
+			clients,
 			customerComponent,
+			// Functions
+			toggleCustomer,
+			updateCustomers
 		}
 	}
 };
