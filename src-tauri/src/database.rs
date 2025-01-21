@@ -296,7 +296,7 @@ pub fn read_all_details(id: &str) -> Result<Vec<HashMap<String, String>>, String
     };
     Ok(details)
 } 
-pub fn read_all_vehicles(domain: &str) -> Result<Vec<String>, String> {
+pub fn read_all_vehicles(domain: &str) -> Result<Vec<HashMap<String, String>>, String> {
     let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string()),
@@ -305,22 +305,39 @@ pub fn read_all_vehicles(domain: &str) -> Result<Vec<String>, String> {
         Ok(stmt) => stmt,
         Err(_) => return Err("Failed to prepare SQL statement".to_string()),
     };
-    let mut vehicles = Vec::new();
 
-    let rows = match stmt.query_map([], |row| row.get(0)) {
-        Ok(rows) => rows,
-        Err(e) => return Err(e.to_string()),
+    let vehicles_iter = match stmt.query_map([], |row| {
+        let mut map = HashMap::new();
+        let domain: String = row.get(0)?;
+        let maker: String = row.get(1)?;
+        let model: String = row.get(2)?;
+        let tipo: String = row.get(3)?;
+        let colour: String = row.get(4)?;
+        let year: u16 = row.get(5)?;
+        let owner: String = row.get(6)?;
+
+        // Insert values in the HashMap
+        map.insert("domain".to_string(), domain);
+        map.insert("maker".to_string(), maker);
+        map.insert("model".to_string(), model);
+        map.insert("tipo".to_string(), tipo);
+        map.insert("colour".to_string(), colour);
+        map.insert("year".to_string(), year.to_string());
+        map.insert("owner".to_string(), owner);
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
     };
 
-    for row in rows {
-        let plate: String = match row {
-            Ok(row) => row,
-            Err(e) => return Err(format!("Err ({})", e)),
-        };
-        if plate.contains(domain) || domain == "none" {
-            vehicles.push(plate);
+    let mut vehicles: Vec<HashMap<String, String>> = Vec::new();
+
+    for vehicle in vehicles_iter {
+        match vehicle {
+            Ok(v) => vehicles.push(v),
+            Err(e) => return Err(format!("Failed to process row {}", e).to_string()),
         }
-    }
+    };
     Ok(vehicles)
 }
 pub fn read_all_customers() -> Result<Vec<HashMap<String, String>>, String> {

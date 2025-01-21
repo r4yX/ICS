@@ -118,7 +118,7 @@ fn obtain_details(id: &str) -> Result<Vec<HashMap<String, String>>, String> {
     Ok(res)
 }
 #[tauri::command]
-fn obtain_vehicles(plate: &str) -> Result<Vec<String>, String> {
+fn obtain_vehicles(plate: &str) -> Result<Vec<HashMap<String, String>>, String> {
     let res = read_all_vehicles(plate)?;
     Ok(res)
 }
