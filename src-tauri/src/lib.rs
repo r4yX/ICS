@@ -68,8 +68,9 @@ fn create_vehicle(domain: &str, maker: &str, model: &str, tipo: &str, colour: &s
     Ok(res)
 }
 #[tauri::command]
-fn create_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) {
-    let _ = insert_item(id, name, price, tipo, manufacturer, supplier, model, stock);
+fn create_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) -> Result<String, String> {
+    let res = insert_item(id, name, price, tipo, manufacturer, supplier, model, stock)?;
+    Ok(res)
 }
 #[tauri::command]
 fn create_worker(name: &str, dni: &str, phone: &str, address: &str, salary: f32) -> Result<String, String> {
@@ -113,13 +114,18 @@ fn obtain_customers() -> Result<Vec<HashMap<String, String>>, String> {
     Ok(res)
 }
 #[tauri::command]
+fn obtain_items() -> Result<Vec<HashMap<String, String>>, String> {
+    let res = read_all_items()?;
+    Ok(res)
+}
+#[tauri::command]
 fn obtain_details(id: &str) -> Result<Vec<HashMap<String, String>>, String> {
     let res = database::read_all_details(id)?;
     Ok(res)
 }
 #[tauri::command]
-fn obtain_vehicles(plate: &str) -> Result<Vec<HashMap<String, String>>, String> {
-    let res = read_all_vehicles(plate)?;
+fn obtain_vehicles() -> Result<Vec<HashMap<String, String>>, String> {
+    let res = read_all_vehicles()?;
     Ok(res)
 }
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -129,7 +135,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_vehicle,
         create_item, create_order, create_worker, create_payment, create_history, obtain_budgets,
         obtain_orders, obtain_history, obtain_details, obtain_vehicles, obtain_customers,
-        pay_order])
+        obtain_items, pay_order])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

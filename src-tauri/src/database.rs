@@ -66,13 +66,18 @@ pub fn update_vehicles(domain: &str, owner: &str) -> Result <String, String>{
         Err(e) => Err(e.to_string())
     }
 }
-pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) -> Result<()> {
-    let conn = Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db")?;
-    conn.execute(
-        "INSERT INTO inventory (id, name, price, tipo, manufacturer, supplier, model, stock) VALUES (?1, ?2, ?3, ?4, ?5, ?7, ?8)",
+pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) -> Result<String, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    match conn.execute(
+        "INSERT INTO inventory (id, name, price, tipo, manufacturer, supplier, model, stock) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
         params![id, name, price, tipo, manufacturer, supplier, model, stock],
-    )?;
-    Ok(())
+    ) {
+        Ok(_) => Ok(format!("Item {} created successfully.", name)),
+        Err(e) => Err(format!("Err ({}) creating item {}", e, name)),
+    }
 }
 pub fn update_balance(date: &str, tipo: &str, amount: f32, name: &str) -> Result<String, String> {
     let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
@@ -296,7 +301,7 @@ pub fn read_all_details(id: &str) -> Result<Vec<HashMap<String, String>>, String
     };
     Ok(details)
 } 
-pub fn read_all_vehicles(domain: &str) -> Result<Vec<HashMap<String, String>>, String> {
+pub fn read_all_vehicles() -> Result<Vec<HashMap<String, String>>, String> {
     let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string()),
@@ -339,6 +344,52 @@ pub fn read_all_vehicles(domain: &str) -> Result<Vec<HashMap<String, String>>, S
         }
     };
     Ok(vehicles)
+}
+pub fn read_all_items() -> Result<Vec<HashMap<String, String>>, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+        Ok(conn) => conn,
+        Err(e) => return Err(e.to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM inventory") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+
+    let inventory_iter = match stmt.query_map([], |row| {
+        let mut map = HashMap::new();
+        let id: String = row.get(0)?;
+        let name: String = row.get(1)?;
+        let price: f32 = row.get(2)?;
+        let tipo: String = row.get(3)?;
+        let manufacturer: String = row.get(4)?;
+        let supplier: String = row.get(5)?;
+        let model: String = row.get(6)?;
+        let stock: u16 = row.get(7)?;
+
+        // Insert values in the HashMap
+        map.insert("id".to_string(), id);
+        map.insert("name".to_string(), name);
+        map.insert("price".to_string(), price.to_string());
+        map.insert("tipo".to_string(), tipo);
+        map.insert("manufacturer".to_string(), manufacturer);
+        map.insert("supplier".to_string(), supplier);
+        map.insert("model".to_string(), model);
+        map.insert("stock".to_string(), stock.to_string());
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
+    };
+
+    let mut inventory: Vec<HashMap<String, String>> = Vec::new();
+
+    for item in inventory_iter {
+        match item {
+            Ok(i) => inventory.push(i),
+            Err(e) => return Err(format!("Failed to process row {}", e).to_string()),
+        }
+    };
+    Ok(inventory)
 }
 pub fn read_all_customers() -> Result<Vec<HashMap<String, String>>, String> {
     let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
