@@ -73,8 +73,6 @@ export default {
 		SvgIcon,
 	},
 	setup({ emit }) {
-    const isVehicle = ref(true);
-
 		const addVehicle = async() => {
 			let log = await invoke('create_vehicle', {
 			'domain':plate.value, 'maker': maker.value, 'model':model.value, 'tipo':tipo.value,
@@ -83,7 +81,6 @@ export default {
 		}
 
 		return {
-			isVehicle,
 			// Input vars
 			plate,
 			maker,
@@ -94,8 +91,7 @@ export default {
 			// Functions
 			addVehicle,
 			// Icons
-			mdiClose,
-			mdiCheck,
+			mdiClose, mdiCheck
 		};
 	},
 };
@@ -110,6 +106,7 @@ export default {
   width: 100%;
   height: 100%;
   background-color: #0005;
+	z-index: 90;
 }
 #create-vehicle {
   display: flex;
@@ -127,6 +124,7 @@ export default {
   background-color: #202020;
   border: 2px solid #668076;
   border-radius: 9px;
+	z-index: 100;
 }
 #create-vehicle > button {
   position: absolute;

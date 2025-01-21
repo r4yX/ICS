@@ -8,8 +8,7 @@
 		<p title="IVA ($)">${{ detail.iva }}</p>
 		<p title="Total">${{ detail.total }}</p>
 		<button id="del-btn" @click="delDetail(index)" type="button">
-			<svg-icon type="mdi" :path="mdiDelete" />
-		</button>
+			<svg-icon type="mdi" :path="mdiDelete"/></button>
 	</div>
 </template>
 

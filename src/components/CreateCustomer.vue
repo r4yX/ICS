@@ -94,8 +94,6 @@ export default {
 				domains.value.push({"label": res[r].domain, "value":res[r].domain})
 			}
 		}
-    const isCustomer = ref(true);
-
 		const delCar = (index) => {vehicles.value.splice(index, 1);};
 
 		const addCar = () => {
@@ -110,7 +108,6 @@ export default {
 		onMounted(updateCars)
     // -- Return
 		return {
-			isCustomer,
 			domains,
 			// Input vars
 			customer,

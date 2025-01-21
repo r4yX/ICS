@@ -1,18 +1,18 @@
 <template>
   <div id="menu" :class="{ hidden: isMenuHidden }">
-		<button id="toggle-menu" @click="toggleMenu()"><svg-icon type="mdi" :path="mdiChevronLeft" /></button>
-    <ul>
-			<button @click="navigateTo('budgets')"><svg-icon type="mdi" :path="mdiNoteText"></svg-icon><p>Presupuesto</p></button>
-			<button @click="navigateTo('orders')"><svg-icon type="mdi" :path="mdiNoteCheck"></svg-icon><p>Orden de Trabajo</p></button>
-      <button @click="navigateTo('history')"><svg-icon type="mdi" :path="mdiClock"></svg-icon><p>Historico</p></button>
+		<button id="toggle-menu" @click="toggleMenu()"><svg-icon type="mdi" :path="mdiChevronLeft"/></button>
+    <ul id="views">
+			<button @click="navigateTo('budgets')" id="budgets"><svg-icon type="mdi" :path="mdiNoteText"/><p>Presupuesto</p></button>
+			<button @click="navigateTo('orders')" id="orders"><svg-icon type="mdi" :path="mdiNoteCheck"/><p>Orden de Trabajo</p></button>
+      <button @click="navigateTo('history')" id="history"><svg-icon type="mdi" :path="mdiClock"/><p>Historico</p></button>
       <hr>
-      <button @click="navigateTo('customers')"><svg-icon type="mdi" :path="mdiAccount"></svg-icon><p>Clientes</p></button>
-      <button @click="navigateTo('vehicles')"><svg-icon type="mdi" :path="mdiCar"></svg-icon><p>Vehiculos</p></button>
-			<button @click="navigateTo('inventory')"><svg-icon type="mdi" :path="mdiFileTable"></svg-icon><p>Inventario</p></button>
+      <button @click="navigateTo('customers')" id="customers"><svg-icon type="mdi" :path="mdiAccount"/><p>Clientes</p></button>
+      <button @click="navigateTo('vehicles')" id="vehicles"><svg-icon type="mdi" :path="mdiCar"/><p>Vehiculos</p></button>
+			<button @click="navigateTo('inventory')" id="inventory"><svg-icon type="mdi" :path="mdiFileTable"/><p>Inventario</p></button>
       <hr>
-      <button @click="navigateTo('balance')"><svg-icon type="mdi" :path="mdiCashRegister"></svg-icon><p>Balance</p></button>
-      <button @click="navigateTo('workers')"><svg-icon type="mdi" :path="mdiAccountHardHat"></svg-icon><p>Trabajadores</p></button>
-      <button @click="navigateTo('config')" id="config"><svg-icon type="mdi" :path="mdiCog"></svg-icon><p>Configuración</p></button>
+      <button @click="navigateTo('balance')" id="balance"><svg-icon type="mdi" :path="mdiCashRegister"/><p>Balance</p></button>
+      <button @click="navigateTo('workers')" id="workers"><svg-icon type="mdi" :path="mdiAccountHardHat"/><p>Trabajadores</p></button>
+      <button @click="navigateTo('config')" id="config"><svg-icon type="mdi" :path="mdiCog"/><p>Configuración</p></button>
     </ul>
   </div>
 </template>
@@ -33,7 +33,15 @@ export default {
     // Navegación con Vue Router
     const router = useRouter();
     const navigateTo = (routeName) => {
+			let views = document.getElementById('views');
+			let children = views.children;
+
+			for (let i = 0; i < children.length; i++) {
+					children[i].style.background = '#24c8db20';
+			}
       router.push({ name: routeName });
+			let clicked = document.getElementById(routeName);
+			clicked.style.background = '#44e8fb80';
     };
 
     const isMenuHidden = ref(false);
@@ -49,17 +57,8 @@ export default {
       navigateTo,
       toggleMenu,
 			// Icons
-			mdiChevronLeft,
-			mdiNoteText,
-			mdiNoteCheck,
-			mdiClock,
-			mdiAccount,
-			mdiCar,
-			mdiFileTable,
-			mdiCashRegister,
-			mdiAccountHardHat,
-			mdiShopping,
-			mdiCog,
+			mdiChevronLeft, mdiNoteText, mdiNoteCheck, mdiClock, mdiAccount, mdiCar, mdiFileTable,
+			mdiCashRegister, mdiAccountHardHat,	mdiShopping, mdiCog
     };
   },
 };

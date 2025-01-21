@@ -20,6 +20,7 @@ import { mdiArrowExpandDown, mdiAccount, mdiPhone, mdiCardAccountDetails, mdiAcc
 	mdiAccountQuestion, mdiPencil} from '@mdi/js';
 
 export default {
+	name: "Client",
 	props: {
 		data: {
 			type: Object,
@@ -29,7 +30,7 @@ export default {
 	components: {
 		SvgIcon,
 	},
-	setup(props) {
+	setup() {
 		const toggleCard = async(e) => {
 			let cardParent = e.target.parentElement;
 			while (cardParent.tagName.toLowerCase() != 'div') {
@@ -37,7 +38,7 @@ export default {
 			}
 			cardParent.classList.toggle('closed');
 		};
-		// Budget Function (Budgets.vue)
+
 		const editCustomer = async() => {
 			console.log(props.data.name)
 		}
@@ -46,7 +47,8 @@ export default {
 			toggleCard,
 			editCustomer,
 			// Icons
-			mdiArrowExpandDown, mdiAccount, mdiPhone, mdiCardAccountDetails, mdiAccountCreditCard, mdiAccountQuestion, mdiPencil
+			mdiArrowExpandDown, mdiAccount, mdiPhone, mdiCardAccountDetails, mdiAccountCreditCard,
+			mdiAccountQuestion, mdiPencil
 		}
 	},
 };
@@ -61,7 +63,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	width: 90%;
-	height: 360px;
+	height: 200px;
 	justify-content: start;
 	align-items: center;
 	align-self: center;
@@ -108,23 +110,6 @@ export default {
 	display: flex;
 	justify-items: center;
 	align-items: center;
-}
-table {
-	margin: 2rem 1rem;
-}
-td {
-	width: auto;
-	border-radius: .2rem;
-	padding: 3px 6px;
-}
-tr:first-child {
-	background-color: #7f7f7f;
-}
-tr {
-	background-color: #555;
-}
-tr:nth-child(even) {
-	background-color: #232323;
 }
 #checkBtn {
 	display: flex;

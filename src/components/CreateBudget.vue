@@ -1,11 +1,11 @@
 <template>
-  <div id="blur" :class="{ hidden: !isBudget }">
-  <div id="create-budget" :class="{ hidden: !isBudget }">
+	<div id="blur">
+  <div id="create-budget">
 		<button @click="toggleBudget()" id="cancel" title="Cancelar"><svg-icon type="mdi" :path="mdiClose" /></button>
     <input id="budget-number" v-model="id" placeholder="0001-0000001"></input>
 		<form id="budget-form">
-			<div class="rows">
-				<div class="in-row">
+			<div id="customer-data">
+				<div>
 					<label for="customer">Cliente</label>
 					<VueSelect class="vue-select"
 						id="customer"
@@ -14,7 +14,7 @@
 							{ label: 'Fulano de tal', value: 'fulano de tal' },
 						]" placeholder="Nombre Apellido"/>
 				</div>
-				<div class="in-row">
+				<div>
 					<label for="vehicle">Vehiculo</label>
 					<VueSelect class="vue-select"
 						id="vehicle"
@@ -24,25 +24,17 @@
 							{ label: 'ZZZ000', value: 'ZZZ000' },
 						]" placeholder="ABC123"/>
 				</div>
-			</div>
-			<div class="rows">
-				<div class="in-row">
+				<div>
 					<label for="concept">Concepto</label>
 					<VueSelect class="vue-select"
 						id="concept"
 						v-model="concept"
-						:options="[
-							{ label: 'Reparación', value: 'reparacion' },
-							{ label: 'Service', value: 'service' },
-							{ label: 'Mantenimiento', value: 'mantenimiento' },
-							{ label: 'Revisión', value: 'revision' },
-							{ label: 'Garantia', value: 'garantia' },
-							{ label: 'Otros', value: 'otros' },
-						]" placeholder="Reparación"/>
+						:options="concepts" 
+						placeholder="Reparación"/>
 				</div>
-				<div class="in-row">
+				<div>
 					<label for="kilometrage">Kilometraje</label>
-					<input id="kilometrage" v-model="kilometrage" type="text" pattern="\d*" placeholder="Km">
+					<input id="kilometrage" v-model="kilometrage" type="text" pattern="\d*">
 				</div>
 			</div>
       <div id="table">
@@ -100,7 +92,10 @@ import Detail from "@components/Detail.vue";
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiClose, mdiPlus, mdiCheck } from '@mdi/js';
 
-const isBudget = ref(true);
+const concepts = ref([{ label: 'Reparación', value: 'reparacion' },
+		{ label: 'Service', value: 'service' }, { label: 'Mantenimiento', value: 'mantenimiento' },
+		{ label: 'Revisión', value: 'revision' }, { label: 'Garantia', value: 'garantia' },
+		{ label: 'Otros', value: 'otros' }]);
 // Form fields
 const customer = ref("");
 const vehicle = ref("");
@@ -190,7 +185,7 @@ export default {
 			}
 		})
 		return {
-			isBudget,
+			concepts,
 			// Input vars
 			id,
 			customer,
@@ -291,6 +286,12 @@ export default {
 	overflow-y: scroll;
 	overflow-x: scroll;	
 }
+#customer-data {
+	width: 100%;
+	display: grid;
+	grid-template-columns: 40% 40%;
+	column-gap: 20%;
+}
 input {
 	background: #333;
 	border: none;
@@ -302,21 +303,6 @@ input {
 }
 input::placeholder {
 	color: #52525b;
-}
-.rows {
-	margin-top: 2rem;
-	width: 95%;
-  display: flex;
-	justify-content: space-between;
-}
-.in-row {
-	display: flex;
-	width: 40%;
-	flex-direction: column;
-	align-items: space-between;
-}
-.in-row > label {
-  margin: 0 0 .4rem 0;
 }
 /* --  Details  -- */
 #table {

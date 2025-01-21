@@ -112,23 +112,6 @@ export default {
 	justify-items: center;
 	align-items: center;
 }
-table {
-	margin: 2rem 1rem;
-}
-td {
-	width: auto;
-	border-radius: .2rem;
-	padding: 3px 6px;
-}
-tr:first-child {
-	background-color: #7f7f7f;
-}
-tr {
-	background-color: #555;
-}
-tr:nth-child(even) {
-	background-color: #232323;
-}
 #checkBtn {
 	display: flex;
 	align-items: center;

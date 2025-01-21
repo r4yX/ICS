@@ -77,8 +77,6 @@ export default {
 		SvgIcon,
 	},
 	setup() {
-    const isItem = ref(true);
-
 		const addItem = async() => {
 			let log = await invoke('create_item', {'id':idn.value, 'name':name.value,
 			'price':parseFloat(price.value), 'tipo':tipo.value, 'manufacturer':brand.value,
@@ -86,7 +84,6 @@ export default {
 			alert(log)
 		}
 		return {
-			isItem,
 			// Input vars
 			name,
 			idn,
@@ -99,8 +96,7 @@ export default {
 			// Functions
 			addItem,
 			// Icons
-			mdiClose,
-			mdiCheck,
+			mdiClose, mdiCheck
 		};
 	},
 };
@@ -115,6 +111,7 @@ export default {
   width: 100%;
   height: 100%;
   background-color: #0005;
+	z-index: 90;
 }
 #create-item {
   display: flex;
@@ -132,6 +129,7 @@ export default {
   background-color: #202020;
   border: 2px solid #668076;
   border-radius: 9px;
+	z-index: 100;
 }
 #create-item > button {
   position: absolute;

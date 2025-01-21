@@ -6,13 +6,14 @@
 				 @update:modelValue="updateDays"
 				 class="vue-select"
 				 :options="years.map(year => ({ label: year, value: year }))"
-				 placeholder="AÑO"
+				 placeholder="Año"
 			/>
 			<VueSelect 
 				v-model="selectedMonth" 
 				@update:modelValue="updateDays"
 				class="vue-select"
 				:options="months.map((month, i) => ({ label: month, value: i }))"
+				placeholder="Mes"
 			/>
 		</div>
 		<div class="month">
@@ -25,8 +26,7 @@
 					:key="day.date"
 					:class="['day', { empty: !day.isCurrentMonth }]"
 					@click="selectDay(day)"
-				>
-					{{ day.isCurrentMonth ? day.date.getDate() : '' }}
+				> <p>{{ day.isCurrentMonth ? day.date.getDate() : '' }}</p>
 				</div>
 			</div>
 		</div>
@@ -53,6 +53,10 @@ export default {
   },
   methods: {
     updateDays() {
+			// Prevent undefined year or month
+			if (typeof this.selectedYear == "undefined") {return 0}
+			if (typeof this.selectedMonth == "undefined") {return 0}
+
       const firstDay = new Date(this.selectedYear, this.selectedMonth, 1);
       const lastDay = new Date(this.selectedYear, this.selectedMonth + 1, 0);
 
@@ -111,8 +115,9 @@ export default {
 .day {
   width: 2rem;
   height: 2rem;
-  text-align: center;
-  line-height: 2rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
   cursor: pointer;
 	background: #333;
   border: 1px solid #ccc;
