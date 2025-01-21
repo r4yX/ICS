@@ -128,6 +128,11 @@ fn obtain_vehicles() -> Result<Vec<HashMap<String, String>>, String> {
     let res = read_all_vehicles()?;
     Ok(res)
 }
+#[tauri::command]
+fn obtain_workers() -> Result<Vec<HashMap<String, String>>, String> {
+    let res = read_all_workers()?;
+    Ok(res)
+}
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -135,7 +140,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_vehicle,
         create_item, create_order, create_worker, create_payment, create_history, obtain_budgets,
         obtain_orders, obtain_history, obtain_details, obtain_vehicles, obtain_customers,
-        obtain_items, pay_order])
+        obtain_items, obtain_workers, pay_order])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

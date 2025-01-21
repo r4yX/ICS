@@ -1,43 +1,54 @@
 <template>
-	<div id="card">
-		<p title="Nombre"><svg-icon type="mdi" :path="mdiAccount"/>Jhon Doe</p>
-		<p title="DNI"><svg-icon type="mdi" :path="mdiCardAccountDetails"/>12345678</p>
-		<p title="Telefono"><svg-icon type="mdi" :path="mdiPhone"/>+54-341-000000</p>
-		<p title="Domicilio"><svg-icon type="mdi" :path="mdiHome"/>742 Evergreen Terrace</p>
-		<p title="Sueldo"><svg-icon type="mdi" :path="mdiCurrencyUsd"/>200.000</p>
-		<button @click="showPays()">Pagos</button>
+	<div id="card" class="closed">
+		<button id="closeBtn" @click="toggleCard($event)"><svg-icon type="mdi" :path="mdiArrowExpandDown"/></button>
+		<div id="header">
+			<p title="Nombre"><svg-icon type="mdi" :path="mdiAccount"/>{{ data.name }}</p>
+			<p title="DNI"><svg-icon type="mdi" :path="mdiCardAccountDetails"/>{{ data.dni }}</p>
+			<p title="Telefono"><svg-icon type="mdi" :path="mdiPhone"/>{{ data.phone }}</p>
+			<p title="Direccion"><svg-icon type="mdi" :path="mdiHome"/>{{ data.address }}</p>
+			<p title="Salario"><svg-icon type="mdi" :path="mdiCashRegister"/>{{ data.salary }}</p>
+		</div>
+		<button title="checkPay" id="checkBtn" @click="getPays()"><svg-icon type="mdi" :path="mdiCurrencyUsd"/></button>
+		<button title="Eliminar" id="checkBtn" @click="getPays()"><svg-icon type="mdi" :path="mdiCurrencyUsd"/></button>
 	</div>
 </template>
 
 <script>
 import { ref } from "vue";
+import { invoke } from "@tauri-apps/api/core";
 import SvgIcon from '@jamescoyle/vue-icon';
-import { mdiAccount, mdiCardAccountDetails, mdiPhone, mdiHome, mdiPencil, mdiCurrencyUsd } from '@mdi/js';
+import { mdiArrowExpandDown, mdiAccount, mdiCardAccountDetails, mdiPhone, mdiHome,
+		mdiCashRegister, mdiCurrencyUsd} from '@mdi/js';
 
 export default {
+	props: {
+		data: {
+			type: Object,
+			required: true
+		}, 
+	},
 	components: {
 		SvgIcon,
 	},
-	setup() {
-		const toggleCard = (e) => {
+	setup(props) {
+		const toggleCard = async(e) => {
 			let cardParent = e.target.parentElement;
 			while (cardParent.tagName.toLowerCase() != 'div') {
 				cardParent = cardParent.parentElement
 			}
 			cardParent.classList.toggle('closed');
 		};
-		const showPays = () => {}
+
+		const addOwner = async() => {
+			console.log(props.data.domain)
+		}
 
 		return {
-			showPays,
 			toggleCard,
+			addOwner,
 			// Icons
-			mdiAccount,
-			mdiCardAccountDetails,
-			mdiPhone,
-			mdiHome,
-			mdiPencil,
-			mdiCurrencyUsd,
+			mdiArrowExpandDown, mdiAccount, mdiCardAccountDetails, mdiPhone, mdiHome, 
+			mdiCashRegister, mdiCurrencyUsd,
 		}
 	},
 };
@@ -46,39 +57,88 @@ export default {
 
 <style scoped>
 #card {
+	margin: 2rem 0;
 	position: relative;
-	display: grid;
-	margin: 0 auto;
-	grid-column-gap: 8rem;
-	grid-template-columns: 1fr 1fr;
-	justify-items: center;
-	align-items: center;
-	width: 90%;
-	height: 360px;
-	border-radius: .5rem;
 	background: #333;
+	display: flex;
+	flex-direction: column;
+	width: 90%;
+	height: 260px;
+	justify-content: start;
+	align-items: center;
+	align-self: center;
+	border-radius: .5rem;
 	overflow-x: hidden;
 	overflow-y: scroll; 
 	transition: height .7s ease;
 }
-#card > *:not(button) {
+#card.closed {
+	height: 3.2rem;
+	overflow-y: hidden; 
+}
+#closeBtn {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	cursor: default;
-}
-#card > button {
-	font-size: 18px;
-	padding: .5rem 1rem;
-	outline: none;
-	color: white;
-	background: #333;
-	border: 1px solid #999;
-	border-radius: .4rem;
+	justify-content: center;
+	height: 2.2rem;
+	width: 2.2rem;
+	position: absolute;
+	right: .6rem;
+	margin-top: .5rem;
+	border: none;
 	cursor: pointer;
-	transition: background .2s;
+	border-radius: .5rem;
+	transition: transform .3s;
+	transform: rotateZ(180deg);
+	z-index: 2;
 }
-#card > button:hover {
-	background: #555;
+#card.closed > #closeBtn {
+	transform: rotateZ(0deg);
+}
+#closeBtn:focus {
+	all: none
+}
+#header {
+	display: grid;
+	grid-column-gap: 2rem;
+	grid-template-columns: 1fr 1fr;
+	justify-items: center;
+	align-items: center;
+}
+#header > p {
+	cursor: default;
+	display: flex;
+	justify-items: center;
+	align-items: center;
+}
+table {
+	margin: 2rem 1rem;
+}
+td {
+	width: auto;
+	border-radius: .2rem;
+	padding: 3px 6px;
+}
+tr:first-child {
+	background-color: #7f7f7f;
+}
+tr {
+	background-color: #555;
+}
+tr:nth-child(even) {
+	background-color: #232323;
+}
+#checkBtn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 2.2rem;
+	width: 2.2rem;
+	position: absolute;
+	right: .6rem;
+	bottom: .5rem;
+	border: none;
+	cursor: pointer;
+	border-radius: .5rem;
 }
 </style>

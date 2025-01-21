@@ -430,6 +430,45 @@ pub fn read_all_customers() -> Result<Vec<HashMap<String, String>>, String> {
     };
     Ok(customers)
 }
+pub fn read_all_workers() -> Result<Vec<HashMap<String, String>>, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM workers") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+    let workers_iter = match stmt.query_map([], |row| {
+        let mut map = HashMap::new();
+        let name: String = row.get(0)?;
+        let phone: String = row.get(1)?;
+        let dni: String = row.get(2)?;
+        let address: String = row.get(3)?;
+        let salary: f32 = row.get(4)?;
+
+        // Insert values in the HashMap
+        map.insert("name".to_string(), name);
+        map.insert("phone".to_string(), phone);
+        map.insert("dni".to_string(), dni);
+        map.insert("address".to_string(), address);
+        map.insert("salary".to_string(), salary.to_string());
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
+    };
+
+    let mut workers: Vec<HashMap<String, String>> = Vec::new();
+
+    for worker in workers_iter {
+        match worker {
+            Ok(w) => workers.push(w),
+            Err(e) => return Err(format!("Failed to process row {}", e).to_string()),
+        }
+    };
+    Ok(workers)
+}
 pub fn read_budget(id: &str) -> Result<Budget, String> {
     let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,
@@ -538,7 +577,7 @@ pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, sub
     }
 }
 pub fn insert_worker(name: &str, dni: &str, phone: &str, address: &str, salary: f32) -> Result<String, String> {
-    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
