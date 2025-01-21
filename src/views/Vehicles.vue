@@ -5,23 +5,34 @@
 			<button @click="toggleVehicle"><svg-icon type="mdi" :path="mdiPlus"/></button>
 		</div>
 		<component :is="VehicleComponent" @destroy="VehicleComponent = null"/>
+		<Vehicle
+        v-for="(vehicle, index) in vehicles"
+        :key="index"
+        :data="vehicle"
+        :index="index"
+				@refresh-budgets="updateVehicles"
+		/>
   </div>
 </template>
 
 <script>
-import { shallowRef } from 'vue';
+import { ref, onMounted, shallowRef } from 'vue';
+import { invoke } from "@tauri-apps/api/core";
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiPlus } from '@mdi/js';
 import CreateVehicle from "@components/CreateVehicle.vue";
+import Vehicle from "@components/Vehicle.vue";
 
 export default {
   name: 'Vehicles',
   components: {
     SvgIcon,
-		CreateVehicle
+		CreateVehicle,
+		Vehicle
   },
 	setup() {
 		const VehicleComponent = shallowRef(null);
+		const vehicles = ref([]);
 
 		const toggleVehicle = () => {
 			if (!VehicleComponent.value) {
@@ -30,7 +41,14 @@ export default {
         VehicleComponent.value = null;
       }
 		};
+
+		const updateVehicles = async() => {
+			let log = await invoke('obtain_vehicles', {'plate': "none"});
+			vehicles.value = log;
+		}
+		onMounted(updateVehicles)
 		return {
+			vehicles,
 			mdiPlus,
 			toggleVehicle,
 			VehicleComponent,
