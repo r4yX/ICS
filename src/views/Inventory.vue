@@ -5,22 +5,35 @@
 			<button @click="toggleItem"><svg-icon type="mdi" :path="mdiPlus"/></button>
 		</div>
 		<component :is="ItemComponent" @destroy="ItemComponent = null"/>
+		<ul>
+		<Item
+        v-for="(item, index) in inventory"
+        :key="index"
+        :data="item"
+        :index="index"
+				@refresh-items="updateInventory"
+				/>
+		</ul>
   </div>
 </template>
 
 <script>
-import { shallowRef } from 'vue';
+import { ref, onMounted, shallowRef } from 'vue';
+import { invoke } from "@tauri-apps/api/core";
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiPlus } from '@mdi/js';
 import CreateItem from "@components/CreateItem.vue";
+import Item from "@components/Item.vue";
 
 export default {
   name: 'Inventory',
   components: {
     SvgIcon,
-		CreateItem
+		CreateItem,
+		Item
   },
 	setup() {
+		const inventory = ref([]);
 		const ItemComponent = shallowRef(null);
 
 		const toggleItem = () => {
@@ -30,10 +43,18 @@ export default {
         ItemComponent.value = null;
       }
 		};
+		
+		const updateInventory = async() => {
+			let log = await invoke('obtain_items', {'tipo':"none"})
+			inventory.value = log
+		}
+		onMounted(updateInventory)
 		return {
-			mdiPlus,
-			toggleItem,
+			inventory,
+			updateInventory,
 			ItemComponent,
+			toggleItem,
+			mdiPlus,
 		}
 	}
 };
