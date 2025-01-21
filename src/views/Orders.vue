@@ -3,12 +3,14 @@
 		<div id="header">
 			<h2>Ordenes</h2>
 		</div>
-		<Budget
-        v-for="(order, index) in orders"
-        :key="index"
-        :data="order"
-        :index="index"
-				/>
+		<ul>
+			<Budget
+					v-for="(order, index) in orders"
+					:key="index"
+					:data="order"
+					:index="index"
+			/>
+		</ul>
   </div>
 </template>
 
@@ -54,22 +56,13 @@ export default {
   flex-direction: column;
 	background: #222;
 	color: #ddd;
+	overflow-y: scroll;
 }
 #header {
   display: flex;
   justify-content: space-between;
 }
 #header > h2 {
-  margin-left: 3rem;
-}
-#header > button {
-  margin: .4rem;
-  height: 2rem;
-  width:  2rem;
-  outline: none;
-  border: none;
-  border-radius: 50%;
-  background-color: #3aa;
-	cursor: pointer;
+  margin-left: 2rem;
 }
 </style>

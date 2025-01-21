@@ -3,7 +3,9 @@
 		<div id="header">
 			<h2>Trabajadores</h2>
 		</div>
-		<Worker />
+		<ul>
+			<Worker />
+		</ul>
   </div>
 </template>
 
@@ -33,6 +35,6 @@ export default {
   justify-content: space-between;
 }
 #header > h2 {
-  margin-left: 3rem;
+  margin-left: 2rem;
 }
 </style>

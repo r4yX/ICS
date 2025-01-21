@@ -5,6 +5,7 @@
 			<button @click="toggleVehicle"><svg-icon type="mdi" :path="mdiPlus"/></button>
 		</div>
 		<component :is="VehicleComponent" @destroy="VehicleComponent = null"/>
+		<ul>
 		<Vehicle
         v-for="(vehicle, index) in vehicles"
         :key="index"
@@ -12,6 +13,7 @@
         :index="index"
 				@refresh-budgets="updateVehicles"
 		/>
+		</ul>
   </div>
 </template>
 
@@ -69,7 +71,7 @@ export default {
   justify-content: space-between;
 }
 #header > h2 {
-  margin-left: 3rem;
+  margin-left: 2rem;
 }
 #header > button {
 	display: flex;

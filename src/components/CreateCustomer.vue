@@ -40,12 +40,12 @@
 							placeholder="AAA000"/>
 						<button type="button" @click="addCar" :disabled="vehicle == '' || vehicle == null"><svg-icon type="mdi" :path="mdiPlus" /></button>
 					</div>
-					<Vehicle 
-						v-for="(plate, index) in vehicles"
-						:key="index"
-						:plate="plate"
-						:index="index"
-						:delCar="delCar" />
+					<div class="item" v-for="(plate, index) in vehicles">
+						<p title="Patente">{{ plate }}</p>
+						<button id="del-btn" @click="delCar(index)" type="button">
+							<svg-icon type="mdi" :path="mdiDelete"></svg-icon>
+						</button>
+					</div>
 				</div>
 				<div class="cols">
 					<label id="dni">DNI</label>
@@ -63,8 +63,7 @@ import { ref, onMounted } from 'vue';
 import { invoke } from "@tauri-apps/api/core";
 import VueSelect from "vue3-select-component";
 import SvgIcon from "@jamescoyle/vue-icon";
-import { mdiClose, mdiPlus, mdiCheck } from "@mdi/js"
-import Vehicle from "./Vehicle.vue";
+import { mdiClose, mdiPlus, mdiCheck, mdiDelete } from "@mdi/js"
 
 const customer = ref("");
 const phone = ref("");
@@ -87,13 +86,12 @@ export default {
 	components: {
 		VueSelect,
 		SvgIcon,
-		Vehicle,
 	},
 	setup() {
 		const updateCars = async() => {
 			let res = await invoke('obtain_vehicles', {'plate': vehicle.value})
 			for (let r in res) {
-				domains.value.push({"label": res[r], "value":res[r]})
+				domains.value.push({"label": res[r].domain, "value":res[r].domain})
 			}
 		}
     const isCustomer = ref(true);
@@ -128,9 +126,7 @@ export default {
 			addCustomer,
 			updateCars,
 			// Icons
-			mdiClose,
-			mdiPlus,
-			mdiCheck,
+			mdiClose,	mdiPlus, mdiCheck,mdiDelete
 		};
 	},
 };
@@ -145,6 +141,7 @@ export default {
   width: 100%;
   height: 100%;
   background-color: #0005;
+	z-index: 90;
 }
 #create-customer {
   display: flex;
@@ -163,6 +160,7 @@ export default {
   background-color: #202020;
   border: 2px solid #668076;
   border-radius: 9px;
+	z-index: 100;
 }
 #create-customer > button {
   position: absolute;
@@ -257,6 +255,36 @@ export default {
 #vehicle-row > button:not([disabled]):hover {
 	cursor: pointer;
   background: #3d5859;
+}
+/* -- Vehilce plate item -- */
+.item {
+	width: 100%;
+	display: grid;
+	gap: 10px;
+	grid-template-columns: 64px 74px 63px 100px 130px 64px 54px auto;
+	justify-content: start;
+	align-items: center;
+}
+.item > * {
+	padding: 0 10px;
+}
+#del-btn {
+	padding: 2px 6px 3px 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 2rem;
+	width: 2rem;
+	background: #333;
+	cursor: pointer;
+	border: 1px solid #999;
+	border-radius: .4rem;
+	color: white;
+	margin-left: 1.4rem;
+	transition: background .2s;
+}
+#del-btn:hover {
+	background: #543c3c;
 }
 /* --  Custom Select  -- */
 :deep(.vue-select) {

@@ -51,7 +51,7 @@ export default {
   justify-content: space-between;
 }
 #header > h2 {
-  margin-left: 3rem;
+  margin-left: 2rem;
 }
 #header > button {
 	display: flex;

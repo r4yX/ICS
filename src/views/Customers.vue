@@ -5,13 +5,15 @@
 			<button @click="toggleCustomer"><svg-icon type="mdi" :path="mdiPlus"/></button>
 		</div>
 		<component :is="customerComponent" @destroy="customerComponent = null"/>
-		<Client
-        v-for="(client, index) in clients"
-        :key="index"
-        :data="client"
-        :index="index"
-				@refresh-budgets="updateCustomers"
-			/>
+		<ul>
+			<Client
+					v-for="(client, index) in clients"
+					:key="index"
+					:data="client"
+					:index="index"
+					@refresh-budgets="updateCustomers"
+				/>
+		</ul>
   </div>
 </template>
 
@@ -72,7 +74,7 @@ export default {
   justify-content: space-between;
 }
 #header > h2 {
-  margin-left: 3rem;
+  margin-left: 2rem;
 }
 #header > button {
 	display: flex;
