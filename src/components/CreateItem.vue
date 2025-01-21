@@ -5,15 +5,15 @@
     <form id="item-form">
 				<div class="cols">
 					<label for="name">Nombre *</label>
-					<input id="name" placeholder="Cambio de Aceite" />
+					<input v-model="name" id="name" placeholder="Cambio de Aceite" />
 				</div>
 				<div class="cols">
 					<label id="idn">ID</label>
-					<input id="idn" type="text" placeholder="0000 or F0000">
+					<input v-model="idn" id="idn" type="text" placeholder="0000 or F0000">
 				</div>
 				<div class="cols">
 					<label for="price">Precio *</label>
-					<input id="price" placeholder="0.000,00" />
+					<input v-model="price" id="price" placeholder="0.000,00" />
 				</div>
 				<div class="cols">
 					<label for="tipo">Tipo de Item *</label>
@@ -27,19 +27,19 @@
 				</div>
 				<div :class="{cols:true, hidden: tipo != 'product'}">
 					<label for="brand">Marca</label>
-					<input id="brand" placeholder="Denso" />
+					<input v-model="brand" id="brand" placeholder="Denso" />
 				</div>
 				<div :class="{cols:true, hidden: tipo != 'product'}">
-					<label id="model">Modelo</label>
-					<input id="model" type="text" placeholder="Inyector Common Rail">
+					<label for="model">Modelo</label>
+					<input v-model="model" id="model" type="text" placeholder="Inyector Common Rail">
 				</div>
 				<div :class="{cols:true, hidden: tipo != 'product'}">
-					<label id="supplier">Proveedor</label>
-					<input id="supplier" type="text" placeholder="Rosario Filtros">
+					<label for="supplier">Proveedor</label>
+					<input v-model="supplier" id="supplier" type="text" placeholder="Rosario Filtros">
 				</div>
 				<div :class="{cols:true, hidden: tipo != 'product'}">
-					<label id="stock">Stock</label>
-					<input id="stock" type="text" placeholder="99">
+					<label for="stock">Stock</label>
+					<input v-model="stock" id="stock" type="text" placeholder="99">
 				</div>
     </form>
 		<button id="confirm" title="Añadir Item" @click="addItem" type="button"><svg-icon type="mdi" :path="mdiCheck" /></button>
@@ -49,13 +49,14 @@
 
 <script>
 import { ref } from 'vue';                
+import { invoke } from "@tauri-apps/api/core";
 import VueSelect from "vue3-select-component";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiCheck } from "@mdi/js"
 
 const name = ref("");
 const idn = ref("");
-const price = ref("");
+const price = ref(0.0);
 const tipo = ref("");
 const brand = ref("");
 const model = ref("");
@@ -78,8 +79,12 @@ export default {
 	setup() {
     const isItem = ref(true);
 
-		const addItem = () => {}
-    // -- Return
+		const addItem = async() => {
+			let log = await invoke('create_item', {'id':idn.value, 'name':name.value,
+			'price':parseFloat(price.value), 'tipo':tipo.value, 'manufacturer':brand.value,
+			'supplier':supplier.value, 'model':model.value, 'stock':parseInt(stock.value)})
+			alert(log)
+		}
 		return {
 			isItem,
 			// Input vars
