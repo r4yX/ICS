@@ -78,7 +78,7 @@
 			<p>IVA</p>
 			<p>Total</p>
 		</div>
-		<Item
+		<Detail
         v-for="(detail, index) in details"
         :key="index"
         :detail="detail"
@@ -96,7 +96,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { ref, watch } from 'vue';                
 import VueSelect from "vue3-select-component";
 
-import Item from "../components/Item.vue";
+import Detail from "@components/Detail.vue";
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiClose, mdiPlus, mdiCheck } from '@mdi/js';
 
@@ -120,7 +120,7 @@ export default {
 	components: {
 		SvgIcon,
 		VueSelect,
-		Item,
+		Detail,
 	},
 	methods: {
 		toggleBudget() {
