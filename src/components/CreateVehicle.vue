@@ -5,7 +5,7 @@
     <form id="vehicle-form">
 				<div class="cols">
 					<label for="plate">Patente *</label>
-					<input id="plate" placeholder="AAA000" />
+					<input v-model="plate" id="plate" placeholder="AAA000" />
 				</div>
 				<div class="cols">
 					<label for="tipo">Tipo</label>
@@ -28,16 +28,16 @@
 						]" placeholder="Chevrolet"/>
 				</div>
 				<div class="cols">
-					<label id="color">Color</label>
-					<input id="color" type="text" placeholder="Rojo">
+					<label for="color">Color</label>
+					<input v-model="colour" id="colour" type="text" placeholder="Rojo">
 				</div>
 				<div class="cols">
 					<label for="model">Modelo</label>
-					<input id="model" placeholder="Astra" /> 
+					<input v-model="model" id="model" placeholder="Astra" /> 
 				</div>
 				<div class="cols">
-					<label id="year">Año</label>
-					<input id="year" type="text" placeholder="1999">
+					<label for="year">Año</label>
+					<input v-model="year" id="year" type="text" placeholder="1999">
 				</div>
     </form>
 		<button id="confirm" title="Añadir Vehiculo" @click="addVehicle" type="button"><svg-icon type="mdi" :path="mdiCheck" /></button>
@@ -46,7 +46,8 @@
 </template>
 
 <script>
-import { ref } from 'vue';                
+import { ref } from 'vue';
+import { invoke } from "@tauri-apps/api/core";
 import VueSelect from "vue3-select-component";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiCheck } from "@mdi/js"
@@ -55,8 +56,8 @@ const plate = ref("");
 const maker = ref("");
 const model = ref("");
 const tipo = ref("");
-const color = ref("");
-const year = ref("");
+const colour = ref("");
+const year = ref(0);
 
 export default {
 	methods: {
@@ -71,11 +72,16 @@ export default {
 		VueSelect,
 		SvgIcon,
 	},
-	setup() {
+	setup({ emit }) {
     const isVehicle = ref(true);
 
-		const addVehicle = () => {}
-    // -- Return
+		const addVehicle = async() => {
+			let log = await invoke('create_vehicle', {
+			'domain':plate.value, 'maker': maker.value, 'model':model.value, 'tipo':tipo.value,
+			'colour':colour.value, 'year':parseInt(year.value), 'owner': ""})
+			alert(log)
+		}
+
 		return {
 			isVehicle,
 			// Input vars
@@ -83,7 +89,7 @@ export default {
 			maker,
 			model,
 			tipo,
-			color,
+			colour,
 			year,
 			// Functions
 			addVehicle,

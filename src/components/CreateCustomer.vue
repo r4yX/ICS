@@ -5,12 +5,12 @@
     <form id="customer-form">
 			<div class="rows">
 				<div class="cols">
-					<label for="name">Nombre *</label>
-					<input id="name" placeholder="Jhon Doe" />
+					<label for="customer">Nombre *</label>
+					<input v-model="customer" id="customer" placeholder="Jhon Doe" />
 				</div>
 				<div class="cols">
 					<label for="phone">Telefono *</label>
-					<input id="phone" placeholder="341-012345" /> 
+					<input v-model="phone" id="phone" placeholder="341-012345" /> 
 				</div>
 			</div>
 			<div class="rows">
@@ -26,7 +26,7 @@
 				</div>
 				<div class="cols">
 					<label id="cuit">CUIT / CUIL *</label>
-					<input id="cuit" type="text" placeholder="00-12346789-0">
+					<input v-model="cuit" id="cuit" type="text" placeholder="00-12346789-0">
 				</div>
 			</div>
 			<div class="rows">
@@ -36,10 +36,8 @@
 						<VueSelect class="vue-select"
 							id="vehicle"
 							v-model="vehicle"
-							:options="[
-								{ label: 'ABC123', value: 'ABC123' },
-								{ label: 'ZYX987', value: 'ZYX987' },
-							]" placeholder="AAA000"/>
+							:options="domains"
+							placeholder="AAA000"/>
 						<button type="button" @click="addCar" :disabled="vehicle == '' || vehicle == null"><svg-icon type="mdi" :path="mdiPlus" /></button>
 					</div>
 					<Vehicle 
@@ -51,7 +49,7 @@
 				</div>
 				<div class="cols">
 					<label id="dni">DNI</label>
-					<input id="dni" type="text" placeholder="123456789">
+					<input v-model="dni" id="dni" type="text" placeholder="123456789">
 				</div>
 			</div>
     </form>
@@ -61,7 +59,8 @@
 </template>
 
 <script>
-import { ref } from 'vue';                
+import { ref, onMounted } from 'vue';                
+import { invoke } from "@tauri-apps/api/core";
 import VueSelect from "vue3-select-component";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiPlus, mdiCheck } from "@mdi/js"
@@ -74,6 +73,7 @@ const cuit = ref("");
 const vehicle = ref("");
 const dni = ref("");
 const vehicles = ref([]); 
+const domains = ref([]);
 
 export default {
 	methods: {
@@ -90,6 +90,12 @@ export default {
 		Vehicle,
 	},
 	setup() {
+		const updateCars = async() => {
+			let res = await invoke('obtain_vehicles', {'plate': vehicle.value})
+			for (let r in res) {
+				domains.value.push({"label": res[r], "value":res[r]})
+			}
+		}
     const isCustomer = ref(true);
 
 		const delCar = (index) => {vehicles.value.splice(index, 1);};
@@ -98,10 +104,16 @@ export default {
 			vehicles.value.push(vehicle.value)
 		};
 
-		const addCustomer = () => {}
+		const addCustomer = async() => {
+			let log = await invoke('create_customer', {'name': customer.value, 'phone': phone.value,
+			'cuit': cuit.value, 'dni': dni.value, 'tipo': tipo.value, 'vehicles': vehicles.value})
+			alert(log)
+		}
+		onMounted(updateCars)
     // -- Return
 		return {
 			isCustomer,
+			domains,
 			// Input vars
 			customer,
 			phone,
@@ -114,6 +126,7 @@ export default {
 			addCar,
 			delCar,
 			addCustomer,
+			updateCars,
 			// Icons
 			mdiClose,
 			mdiPlus,
