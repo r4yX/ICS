@@ -89,7 +89,7 @@ export default {
 	},
 	setup() {
 		const updateCars = async() => {
-			let res = await invoke('obtain_vehicles', {'plate': vehicle.value})
+			let res = await invoke('obtain_vehicles')
 			for (let r in res) {
 				domains.value.push({"label": res[r].domain, "value":res[r].domain})
 			}

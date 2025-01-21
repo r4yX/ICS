@@ -45,15 +45,16 @@ export default {
 		};
 
 		const updateVehicles = async() => {
-			let log = await invoke('obtain_vehicles', {'plate': "none"});
+			let log = await invoke('obtain_vehicles');
 			vehicles.value = log;
 		}
 		onMounted(updateVehicles)
 		return {
-			vehicles,
-			mdiPlus,
-			toggleVehicle,
 			VehicleComponent,
+			toggleVehicle,
+			vehicles,
+			updateVehicles,
+			mdiPlus,
 		}
 	}
 };
