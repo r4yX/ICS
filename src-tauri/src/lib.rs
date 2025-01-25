@@ -1,5 +1,6 @@
 mod database;
 use database::*;
+mod output;
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
 
@@ -14,9 +15,12 @@ struct Detail {
     iva: f32,
     total: f32
 }
-
 #[tauri::command]
-fn create_budget(id: &str, date: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, details: Vec<Detail>) {
+fn create_pdf(info: output::Information, client: output::Client, vehicle: output::Vehicle, details: Vec<output::Detail>) {
+    output::create_pdf(info, client, vehicle, details);
+}
+#[tauri::command]
+fn create_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, details: Vec<Detail>) {
    insert_budget(id, customer, vehicle, concept, kilometrage, total).unwrap();
 
    for detail in details.iter() {
@@ -140,7 +144,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_vehicle,
         create_item, create_order, create_worker, create_payment, create_history, obtain_budgets,
         obtain_orders, obtain_history, obtain_details, obtain_vehicles, obtain_customers,
-        obtain_items, obtain_workers, pay_order])
+        obtain_items, obtain_workers, pay_order, create_pdf])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
