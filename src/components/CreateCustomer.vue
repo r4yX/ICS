@@ -20,8 +20,8 @@
 						id="tipo"
 						v-model="tipo"
 						:options="[
-							{ label: 'Particular', value: 'particular' },
-							{ label: 'Corriente', value: 'current' },
+							{ label: 'Particular', value: 'Particular' },
+							{ label: 'Corriente', value: 'Corriente' },
 						]" placeholder="Partiuclar"/>
 				</div>
 				<div class="cols">

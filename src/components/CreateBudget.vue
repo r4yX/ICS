@@ -10,19 +10,16 @@
 					<VueSelect class="vue-select"
 						id="customer"
 						v-model="customer"
-						:options="[
-							{ label: 'Fulano de tal', value: 'fulano de tal' },
-						]" placeholder="Nombre Apellido"/>
+						:options="customers"
+						placeholder="Nombre Apellido"/>
 				</div>
 				<div>
 					<label for="vehicle">Vehiculo</label>
 					<VueSelect class="vue-select"
 						id="vehicle"
 						v-model="vehicle"
-						:options="[
-							{ label: 'ABC123', value: 'ABC123' },
-							{ label: 'ZZZ000', value: 'ZZZ000' },
-						]" placeholder="ABC123"/>
+						:options="domains"
+						placeholder="ABC123"/>
 				</div>
 				<div>
 					<label for="concept">Concepto</label>
@@ -47,8 +44,9 @@
 				<VueSelect class="vue-select"
 					item="item"
 					v-model="item"
-					:options="[{label: 'Cambio de Aceite', value: 'oil'}]"
+					:options="inventory"
 					placeholder="Buscar producto o servicio"
+					@update:modelValue="fillDetail"
 				/>
 				<input id="price" v-model="price" placeholder="0.0"></input>
 				<input id="cant" v-model="cant" placeholder="0"></input>
@@ -84,8 +82,8 @@
 </template>
 
 <script>
+import { ref, watch, onMounted } from 'vue';                
 import { invoke } from '@tauri-apps/api/core';
-import { ref, watch } from 'vue';                
 import VueSelect from "vue3-select-component";
 
 import Detail from "@components/Detail.vue";
@@ -109,6 +107,10 @@ const price = ref(0.0);
 const cant = ref(0);
 const tipo = ref("");
 const iva = ref(0.0);
+//values for selects
+const customers = ref([])
+const domains = ref([])
+const inventory = ref([])
 
 export default {
 	name: 'CreateBudget',
@@ -125,6 +127,36 @@ export default {
 		}
 	},
 	setup(props, { emit }) {
+		// Get data for Select
+		const updateVehicles = async() => {
+			let res = await invoke('obtain_vehicles')
+			for (let r in res) {
+				domains.value.push({"label": res[r].domain, "value":res[r].domain})
+			}
+		}
+		const updateCustomers = async() => {
+			let res = await invoke('obtain_customers')
+			for (let r in res) {
+				customers.value.push({"label": res[r].name, "value":res[r].name})
+			}
+		}
+		const updateInventory = async() => {
+			let res = await invoke('obtain_items')
+			for (let r in res) {
+				inventory.value.push({"label": res[r].name, "value":res[r]})
+			}
+		}
+		
+		const fillDetail = (selected) => {
+			console.log(selected)
+			price.value = "";
+			tipo.value = "";
+			if (selected != undefined) {
+				price.value = selected.price
+				tipo.value = selected.tipo
+			}
+		}
+
 		const createBudget = async() => {
 			// Get actual date
 			const today = new Date();
@@ -156,9 +188,9 @@ export default {
         //TO-DO: check if id is available;
       }, 400);
     };
-
     watch(id, handleInputChange);
 
+		// Detail functions
 		const delDetail = (index) => {details.value.splice(index, 1);};
 
 		const addDetail = () => {
@@ -169,7 +201,7 @@ export default {
 
 			details.value.push({
 				id: id.value,
-				item: item.value,
+				item: item.value.name,
 				price: parseFloat(price.value),
 				cant: parseInt(cant.value),
 				tipo: tipo.value,
@@ -184,8 +216,15 @@ export default {
 				cancelBtn.click()
 			}
 		})
+		onMounted(updateVehicles)
+		onMounted(updateCustomers)
+		onMounted(updateInventory)
 		return {
+			customers,
+			domains,
+			inventory,
 			concepts,
+			fillDetail,
 			// Input vars
 			id,
 			customer,

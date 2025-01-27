@@ -29,9 +29,10 @@
 				 </tr>
 			 </tbody>
 		 </table>
-		<button v-if="data.paid == 'none'" title="Aprobar Presupuesto" id="checkBtn" @click="createBudget()"><svg-icon type="mdi" :path="mdiCheck"/></button>
-		<button v-if="data.paid != 'none' && data.pay_date == 'none'" title="Acreditar pago" id="checkBtn" @click="payOrder()"><svg-icon type="mdi" :path="mdiCashPlus"/></button>
-		<button v-if="data.pay_date != 'none'" title="Eliminar del historial" id="checkBtn" @click="deleteHistory()"><svg-icon type="mdi" :path="mdiClockMinus"/></button>
+	  <button v-if="data.pay_date == 'none'" title="Guardar PDF" class="budget_btns" id="pdfBtn" @click="createPDF()"><svg-icon type="mdi" :path="mdiFilePdfBox"/></button>
+		<button v-if="data.paid == 'none'" title="Aprobar Presupuesto" class="budget_btns" id="checkBtn" @click="createBudget()"><svg-icon type="mdi" :path="mdiCheck"/></button>
+		<button v-if="data.paid != 'none' && data.pay_date == 'none'" title="Acreditar pago" class="budget_btns" id="checkBtn" @click="payOrder()"><svg-icon type="mdi" :path="mdiCashPlus"/></button>
+		<button v-if="data.pay_date != 'none'" title="Eliminar del historial" class="budget_btns" id="checkBtn" @click="deleteHistory()"><svg-icon type="mdi" :path="mdiClockMinus"/></button>
 	</div>
 </template>
 
@@ -39,7 +40,8 @@
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import SvgIcon from '@jamescoyle/vue-icon';
-import { mdiAccount, mdiCar, mdiHelpCircle, mdiRoadVariant, mdiArrowExpandDown, mdiArrowCollapseUp,	mdiCheck, mdiCurrencyUsd, mdiCashCheck, mdiCashPlus, mdiClockMinus, mdiCashRegister} from '@mdi/js';
+import { mdiAccount, mdiCar, mdiHelpCircle, mdiRoadVariant, mdiArrowExpandDown, mdiArrowCollapseUp, mdiFilePdfBox,
+	mdiCheck, mdiCurrencyUsd, mdiCashCheck, mdiCashPlus, mdiClockMinus, mdiCashRegister} from '@mdi/js';
 
 export default {
 	props: {
@@ -91,6 +93,23 @@ export default {
 			}
 		}
 
+		// Budget & Order Function to create PDF
+		const createPDF = async() => {
+			let title = props.data.paid == "none" ? "Presupuesto" : "Orden"
+			let now = new Date();
+			let date_now = now.toLocaleString('en-CA', {
+				hour12: false, month: '2-digit', day: '2-digit', year: 'numeric',
+				hour: '2-digit', minute: '2-digit', second: '2-digit'});
+			date_now = date_now.replace(',', '')
+
+			let details_list = await invoke('obtain_details', {'id': props.data.id})
+			let log = await invoke('create_pdf', {
+				"info": {'id': props.data.id, 'title': title, 'date': date_now, 'total':props.data.total},
+				'client':{"name": props.data.customer, "dni":"12345678", "phone":"54-3482-500112",
+				"concept":props.data.concept}, 'vehicle':{"plate": props.data.vehicle, "maker": "Chevrolet",
+				"model": "Astra", "kilometrage":props.data.kilometrage}, 'details': details_list})
+		}
+
 		// History Funtion (History.vue)
 		const deleteHistory = async() => {
 			console.log(props.data)
@@ -101,11 +120,12 @@ export default {
 			toggleCard,
 			createBudget,
 			payOrder,
+			createPDF,
 			deleteHistory,
 			// Icons
 			mdiAccount, mdiCar, mdiHelpCircle, mdiRoadVariant,
 			mdiArrowExpandDown, mdiCheck, mdiCurrencyUsd, mdiCashCheck,
-			mdiCashPlus, mdiClockMinus, mdiCashRegister
+			mdiCashPlus, mdiClockMinus, mdiCashRegister, mdiFilePdfBox
 		}
 	},
 };
@@ -185,17 +205,22 @@ tr {
 tr:nth-child(even) {
 	background-color: #232323;
 }
-#checkBtn {
+.budget_btns {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	height: 2.2rem;
 	width: 2.2rem;
 	position: absolute;
-	right: .6rem;
 	bottom: .5rem;
 	border: none;
 	cursor: pointer;
 	border-radius: .5rem;
+}
+#checkBtn {
+	right: .6rem;
+}
+#pdfBtn {
+	left: .6rem;
 }
 </style>
