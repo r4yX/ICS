@@ -101,8 +101,8 @@ pub fn update_order(id: &str, paid: f32) -> Result<String, String> {
         "UPDATE orders SET paid=?1 WHERE id=?2",
         params![paid, id],
     ) {
-        Ok(_) => Ok(format!("Order {} updated successfully", id)),
-        Err(e) => Err(format!("Err: ({}) updating order {}", e, id)),
+        Ok(_) => Ok(format!("Pay added to order {}", id)),
+        Err(e) => Err(format!("Err: ({}) paying order {}", e, id)),
     }
 }
 pub fn insert_order(id: &str, client: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, paid: f32) -> Result<String, String> {
@@ -638,6 +638,19 @@ pub fn delete_budget(id: &str) -> Result<String, String> {
         params![id]
     ) {
         Ok(_) => Ok(format!("Budget {} deleted", id)),
+        Err(e) => Err(e.to_string()),
+    }
+}
+pub fn delete_order(id: &str) -> Result<String, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(e) => return Err(e.to_string())
+    };
+    match conn.execute(
+        "DELETE FROM orders WHERE id=?1",
+        params![id]
+    ) {
+        Ok(_) => Ok(format!("Order {} deleted", id)),
         Err(e) => Err(e.to_string()),
     }
 }

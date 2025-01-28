@@ -53,8 +53,14 @@ fn create_history(id: &str, pay_date: &str) -> Result<String, String> {
         Ok(order) => order,
         Err(e) => return Err(format!("Err: ({}) reading order {}", e, id)),
     };
-    let res = insert_history(id, order, pay_date)?;
-    Ok(res)
+    match insert_history(id, order, pay_date) {
+        Ok(_) => "History entry inserted successfully",
+        Err(e) => return Err(format!("Err: ({}) creating history entry {}", e, id))
+    };
+    match delete_order(id) {
+        Ok(_) => Ok("Order paid successfully and archived".to_string()),
+        Err(e) => Err(format!("Err: ({}) moving order {}", e, id))
+    }
 }
 #[tauri::command]
 fn create_customer(name: &str, phone: &str, cuit: &str, dni: &str, tipo: &str, vehicles: Vec<&str>) -> Result<String, String> {

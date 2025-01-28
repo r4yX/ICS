@@ -9,6 +9,7 @@
 					:key="index"
 					:data="order"
 					:index="index"
+					@refresh-orders="updateOrders"
 			/>
 		</ul>
   </div>
@@ -45,6 +46,7 @@ export default {
     onMounted(updateOrders);
 		return {
 			orders,
+			updateOrders
 		};
 	},
 };

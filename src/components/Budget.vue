@@ -86,10 +86,11 @@ export default {
 
 				let log = await invoke('create_history', {'id': props.data.id, 'payDate': pay_date})
 				alert(log)
+				emit('refresh-orders')
 			} else {
-				console.log('menor a la deuda');
 				let log = await invoke('pay_order', {'id': props.data.id, 'paid': paid+pay})
 				alert(log)
+				emit('refresh-orders')
 			}
 		}
 
