@@ -3,6 +3,7 @@
 		<div id="create-vehicle">
 			<button @click="toggleVehicle()" id="cancel" title="Cancelar"><svg-icon type="mdi" :path="mdiClose" /></button>
     <form id="vehicle-form">
+				<input v-model="owner" id="owner" title="Dueño" placeholder="Nombre Apellido" />
 				<div class="cols">
 					<label for="plate">Patente *</label>
 					<input v-model="plate" id="plate" placeholder="AAA000" />
@@ -52,6 +53,7 @@ import VueSelect from "vue3-select-component";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiCheck } from "@mdi/js"
 
+const owner = ref("");
 const plate = ref("");
 const maker = ref("");
 const model = ref("");
@@ -76,12 +78,13 @@ export default {
 		const addVehicle = async() => {
 			let log = await invoke('create_vehicle', {
 			'domain':plate.value, 'maker': maker.value, 'model':model.value, 'tipo':tipo.value,
-			'colour':colour.value, 'year':parseInt(year.value), 'owner': ""})
+			'colour':colour.value, 'year':parseInt(year.value), 'owner': owner.value})
 			alert(log)
 		}
 
 		return {
 			// Input vars
+			owner,
 			plate,
 			maker,
 			model,
@@ -156,8 +159,8 @@ export default {
 	background: #434f3b;
 }
 #vehicle-form {
-	height: 90%;
-	margin: auto;
+	height: 80%;
+	margin: 3.5rem auto au0;
   width: 90%;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -187,6 +190,12 @@ export default {
 }
 .cols > label {
   margin: 0 0 .4rem 0;
+}
+#owner {
+  position: absolute;
+  margin: 0px;
+  top: .6rem;
+  right: .6rem;
 }
 /* --  Custom Select  -- */
 :deep(.vue-select) {
