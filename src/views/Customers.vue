@@ -68,6 +68,7 @@ export default {
   flex-direction: column;
 	background: #222;
 	color: #ddd;
+	overflow-y: scroll;
 }
 #header {
   display: flex;

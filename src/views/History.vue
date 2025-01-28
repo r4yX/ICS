@@ -3,12 +3,14 @@
 		<div id="header">
 			<h2>Historial</h2>
 		</div>
-		<Budget
-			v-for="(order, index) in history"
-			:key="index"
-			:data="order"
-			:index="index"
-			/>
+		<ul>
+			<Budget
+				v-for="(order, index) in history"
+				:key="index"
+				:data="order"
+				:index="index"
+				/>
+		</ul>
   </div>
 </template>
 
@@ -58,6 +60,7 @@ export default {
   flex-direction: column;
 	background: #222;
 	color: #ddd;
+	overflow-y: scroll;
 }
 #header {
   display: flex;
