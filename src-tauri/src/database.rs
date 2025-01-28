@@ -641,3 +641,16 @@ pub fn delete_budget(id: &str) -> Result<String, String> {
         Err(e) => Err(e.to_string()),
     }
 }
+pub fn delete_from_history(id: &str) -> Result<String, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+        Ok(conn) => conn,
+        Err(e) => return Err(e.to_string()),
+    };
+    match conn.execute(
+        "DELETE FROM history WHERE id=?1",
+        params![id]
+    ) {
+        Ok(_) => Ok(format!("History id: {} deleted successfully", id)),
+        Err(e) => Err(format!("Err ({}) deleting {} history", e, id))
+    }
+}

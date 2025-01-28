@@ -112,7 +112,9 @@ export default {
 
 		// History Funtion (History.vue)
 		const deleteHistory = async() => {
-			console.log(props.data)
+			let log = await invoke('delete_history', {'id': props.data.id})
+			alert(log)
+			emit('refresh-history')
 		}
 
 		return {

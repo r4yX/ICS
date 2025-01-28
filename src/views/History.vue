@@ -9,6 +9,7 @@
 				:key="index"
 				:data="order"
 				:index="index"
+				@refresh-history="updateHistory"
 				/>
 		</ul>
   </div>
@@ -49,6 +50,7 @@ export default {
     onMounted(updateHistory);
 		return {
 			history,
+			updateHistory
 		};
 	},
 };
