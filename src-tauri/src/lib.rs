@@ -16,8 +16,9 @@ struct Detail {
     total: f32
 }
 #[tauri::command]
-fn create_pdf(info: output::Information, client: output::Client, vehicle: output::Vehicle, details: Vec<output::Detail>) {
-    output::create_pdf(info, client, vehicle, details);
+fn create_pdf(info: output::Information, client: output::Client, vehicle: output::Vehicle, details: Vec<output::Detail>) -> Result<String, String> {
+    let res = output::write_pdf(info, client, vehicle, details)?;
+    Ok(res)
 }
 #[tauri::command]
 fn create_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, details: Vec<Detail>) {

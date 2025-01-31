@@ -34,7 +34,7 @@ pub struct Detail {
     total: String
 }
 
-pub fn create_pdf(info: Information, client: Client, vehicle: Vehicle, details: Vec<Detail>) -> Result<String, String> {
+pub fn write_pdf(info: Information, client: Client, vehicle: Vehicle, details: Vec<Detail>) -> Result<String, String> {
     let font = fonts::from_files("./src", "Montserrat", None).expect("");
     let mut doc = Document::new(font);
     doc.set_title(format!("{} - {}", client.name, info.id));
