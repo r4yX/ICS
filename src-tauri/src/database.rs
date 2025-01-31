@@ -469,6 +469,44 @@ pub fn read_all_workers() -> Result<Vec<HashMap<String, String>>, String> {
     };
     Ok(workers)
 }
+pub fn read_all_movements(date: &str) -> Result<Vec<HashMap<String, String>>, String> {
+    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+        Ok(conn) => conn,
+        Err(e) => return Err(e.to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM balance WHERE date LIKE ?1") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+
+    let balance_iter = match stmt.query_map([format!("{}%", date)], |row| {
+        let mut map = HashMap::new();
+        let date: String = row.get(0)?;
+        let tipo: String = row.get(1)?;
+        let amount: f32 = row.get(2)?;
+        let name: String = row.get(3)?;
+
+        // Insert values in the HashMap
+        map.insert("date".to_string(), date);
+        map.insert("tipo".to_string(), tipo);
+        map.insert("amount".to_string(), amount.to_string());
+        map.insert("name".to_string(), name);
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
+    };
+
+    let mut balance: Vec<HashMap<String, String>> = Vec::new();
+
+    for movement in balance_iter {
+        match movement {
+            Ok(m) => balance.push(m),
+            Err(e) => return Err(format!("Failed to process row {}", e).to_string()),
+        }
+    };
+    Ok(balance)
+}
 pub fn read_budget(id: &str) -> Result<Budget, String> {
     let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
         Ok(conn) => conn,

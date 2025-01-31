@@ -26,11 +26,9 @@ fn create_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilomet
    for detail in details.iter() {
        let _ = insert_detail(id, &detail.item, detail.price, detail.cant, &detail.tipo, detail.subtotal, detail.iva, detail.total);
    }
-   // Add to balance
-   //update_balance(date, "Ingreso", total, &format!("{} - {}", customer, concept)).unwrap();
 }
 #[tauri::command]
-fn create_order(id: &str, paid: f32) -> Result<String, String> {
+fn create_order(id: &str, paid: f32, date: &str) -> Result<String, String> {
     let budget = match read_budget(id) {
         Ok(budget) => budget,
         Err(e) => return Err(format!("Error {}. Reading budget with id {}", e, id))
@@ -42,6 +40,12 @@ fn create_order(id: &str, paid: f32) -> Result<String, String> {
         Ok(_) => "Order inserted".to_string(),
         Err(e) => return Err(format!("Error: {}", e)),
     };
+   // Add to balance
+   if paid != 0.0 {
+       update_balance(date, "Ingreso", budget.total, &format!("{} - {}", budget.customer, budget.concept)).unwrap();
+   };
+
+    // Delete budget
     match delete_budget(id) {
         Ok(_) => Ok(format!("Budget {} is approved.", id)),
         Err(e) => Err(format!("Err ({}) deleting {} budget", e, id))
@@ -143,6 +147,11 @@ fn obtain_workers() -> Result<Vec<HashMap<String, String>>, String> {
     let res = read_all_workers()?;
     Ok(res)
 }
+#[tauri::command]
+fn obtain_balance(date: &str) -> Result<Vec<HashMap<String, String>>, String> {
+    let res = read_all_movements(date)?;
+    Ok(res)
+}
 // Delete functions
 #[tauri::command]
 fn delete_history(id: &str) -> Result<String, String> {
@@ -156,7 +165,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_vehicle,
         create_item, create_order, create_worker, create_payment, create_history, obtain_budgets,
         obtain_orders, obtain_history, obtain_details, obtain_vehicles, obtain_customers,
-        obtain_items, obtain_workers, pay_order, create_pdf, delete_history])
+        obtain_items, obtain_workers, obtain_balance, pay_order, create_pdf, delete_history])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

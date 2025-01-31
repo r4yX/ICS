@@ -67,7 +67,12 @@ export default {
 		// Budget Function (Budgets.vue)
 		const createBudget = async() => {
 			let paid = parseInt(prompt("El cliente ha pagado ($):", "0"))
-			let log = await invoke('create_order', {'id': props.data.id, 'paid': paid})
+			let now = new Date();
+			let approve_date = now.toLocaleString('en-CA', {
+				hour12: false, month: '2-digit', day: '2-digit', year: 'numeric',
+				hour: '2-digit', minute: '2-digit', second: '2-digit'});
+			approve_date = approve_date.replace(',', '')
+			let log = await invoke('create_order', {'id': props.data.id, 'paid': paid, 'date': approve_date})
 			alert(log)
 			emit('refresh-budgets');
 		}

@@ -79,7 +79,9 @@ export default {
     },
     selectDay(day) {
       if (day.isCurrentMonth) {
-				this.$emit("selectDay", day.date.toLocaleDateString('en-GB'));
+			let approve_date = day.date.toLocaleDateString('en-GB', {
+				month: '2-digit', day: '2-digit', year: 'numeric'});
+				this.$emit("selectDay", approve_date);
       }
     },
   },
