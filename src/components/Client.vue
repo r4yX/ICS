@@ -8,7 +8,7 @@
 			<p title="DNI"><svg-icon type="mdi" :path="mdiAccountCreditCard"/>{{ data.dni }}</p>
 			<p title="Tipo de cuenta"><svg-icon type="mdi" :path="mdiAccountQuestion"/>{{ data.tipo }}</p>
 		</div>
-		<button title="Editar cliente" id="checkBtn" @click="editCustomer()"><svg-icon type="mdi" :path="mdiPencil"/></button>
+		<button title="Editar cliente" id="checkBtn" @click="editCustomer(data)"><svg-icon type="mdi" :path="mdiPencil"/></button>
 	</div>
 </template>
 
@@ -30,7 +30,7 @@ export default {
 	components: {
 		SvgIcon,
 	},
-	setup() {
+	setup(props, { emit }) {
 		const toggleCard = async(e) => {
 			let cardParent = e.target.parentElement;
 			while (cardParent.tagName.toLowerCase() != 'div') {
@@ -39,8 +39,14 @@ export default {
 			cardParent.classList.toggle('closed');
 		};
 
-		const editCustomer = async() => {
-			console.log(props.data.name)
+		const editCustomer = async(data) => {
+			// obtain vehicles
+			let log  = await invoke('obtain_vehicles')
+			let domains = log.filter((vehicle) => vehicle.owner == data.name)
+				.map((vehicle) => vehicle.domain)
+			data.vehicles = domains
+			emit("select-customer", data)
+			emit("edit")
 		}
 
 		return {

@@ -33,7 +33,9 @@ pub fn insert_customer(name: &str, phone: &str, cuit: &str, dni: &str, tipo: &st
         Err(e) => return Err(e.to_string()),
     };
     match conn.execute(
-        "INSERT INTO clients (name, phone, cuil, dni, tipo) VALUES (?1, ?2, ?3, ?4, ?5)",
+        "INSERT INTO clients (name, phone, cuil, dni, tipo) VALUES (?1, ?2, ?3, ?4, ?5)
+        ON CONFLICT(dni) DO UPDATE SET phone=excluded.phone, cuil=excluded.cuil,
+        name=excluded.name, tipo=excluded.tipo",
         params![name, phone, cuit, dni, tipo],
     ) {
         Ok(_) => Ok("client added successfully".to_string()),

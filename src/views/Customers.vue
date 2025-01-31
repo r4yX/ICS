@@ -4,7 +4,11 @@
 			<h2>Clientes</h2>
 			<button @click="toggleCustomer"><svg-icon type="mdi" :path="mdiPlus"/></button>
 		</div>
-		<component :is="customerComponent" @destroy="customerComponent = null"/>
+		<component 
+			:is="customerComponent" 
+			:data="selectedCustomer"
+			@destroy="customerComponent = null"
+			@clear-customer="selectCustomer" />
 		<ul>
 			<Client
 					v-for="(client, index) in clients"
@@ -12,7 +16,8 @@
 					:data="client"
 					:index="index"
 					@refresh-budgets="updateCustomers"
-				/>
+					@select-customer="selectCustomer"
+					@edit="toggleCustomer" /> 
 		</ul>
   </div>
 </template>
@@ -35,6 +40,7 @@ export default {
   },
 	setup() {
 		const clients = ref([]);
+		const selectedCustomer = ref({});
 		const customerComponent = shallowRef(null);
 
 		const toggleCustomer = () => {
@@ -49,14 +55,19 @@ export default {
 			let log = await invoke('obtain_customers')
 			clients.value = log
 		}
+		const selectCustomer = (data) => {
+			selectedCustomer.value = data
+		}
 		onMounted(updateCustomers);
 		return {
 			mdiPlus,
 			clients,
 			customerComponent,
+			selectedCustomer,
 			// Functions
 			toggleCustomer,
-			updateCustomers
+			updateCustomers,
+			selectCustomer
 		}
 	}
 };

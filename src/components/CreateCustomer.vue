@@ -22,7 +22,7 @@
 						:options="[
 							{ label: 'Particular', value: 'Particular' },
 							{ label: 'Corriente', value: 'Corriente' },
-						]" placeholder="Partiuclar"/>
+						]" placeholder="Particular"/>
 				</div>
 				<div class="cols">
 					<label id="cuit">CUIT / CUIL *</label>
@@ -65,21 +65,19 @@ import VueSelect from "vue3-select-component";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiPlus, mdiCheck, mdiDelete } from "@mdi/js"
 
-const customer = ref("");
-const phone = ref("");
-const tipo = ref("");
-const cuit = ref("");
-const vehicle = ref("");
-const dni = ref("");
-const vehicles = ref([]); 
-const domains = ref([]);
-
 export default {
+	props: {
+		data: {
+			type: Object,
+			required: false
+		}
+	},
 	methods: {
 		toggleCustomer() {
 			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
 			if (!userConfirmed) {return 0}
 			this.$emit('destroy');
+			this.$emit('clear-customer');
 		}
 	},
 	name: 'CreateCustomer',
@@ -87,7 +85,25 @@ export default {
 		VueSelect,
 		SvgIcon,
 	},
-	setup() {
+	setup(props) {
+		const customer = ref("");
+		const phone = ref("");
+		const tipo = ref("");
+		const cuit = ref("");
+		const vehicle = ref("");
+		const dni = ref("");
+		const vehicles = ref([]); 
+		const domains = ref([]);
+
+		if (props.data != undefined) {
+			customer.value = props.data.name
+			phone.value = props.data.phone
+			tipo.value = props.data.tipo
+			cuit.value = props.data.cuil
+			vehicles.value = props.data.vehicles
+			dni.value = props.data.dni
+		}
+
 		const updateCars = async() => {
 			let res = await invoke('obtain_vehicles')
 			for (let r in res) {
