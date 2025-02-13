@@ -1,4 +1,7 @@
+use std::fs;
+use std::path::PathBuf;
 use std::collections::HashMap;
+use directories::ProjectDirs;
 use rusqlite::{params, Connection, Result};
 use serde::{Serialize, Deserialize};
 
@@ -19,16 +22,34 @@ pub struct Order {
     pub total: f32,
     pub paid: f32,
 }
-pub fn insert_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) -> Result<()> {
-    let conn = Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db")?;
-    conn.execute(
+
+pub fn get_db_path() -> PathBuf {
+    let proj_dirs = ProjectDirs::from("com", "syltr1x", "punto_diesel")
+        .expect("No se pudo obtener el directorio de la aplicación");
+
+    let data_dir = proj_dirs.data_local_dir();
+    fs::create_dir_all(data_dir).expect("No se pudo crear la carpeta de la base de datos");
+
+    data_dir.join("database.db")
+}
+
+pub fn insert_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32) -> Result<String, String> {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
+        Ok(conn) => conn,
+        Err(e) => return Err(format!("Error ({}) opening database connection", e)),
+    };
+    match conn.execute(
         "INSERT INTO budgets (id, client, vehicle, concept, kilometrage, total) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
         params![id, customer, vehicle, concept, kilometrage, total],
-    )?;
-    Ok(())
+    ) {
+        Ok(_) => Ok("client added successfully".to_string()),
+        Err(e) => Err(format!("Err ({})", e)),
+    }
 }
 pub fn insert_customer(name: &str, phone: &str, cuit: &str, dni: &str, tipo: &str) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string()),
     };
@@ -43,7 +64,8 @@ pub fn insert_customer(name: &str, phone: &str, cuit: &str, dni: &str, tipo: &st
     }
 }
 pub fn insert_vehicle(domain: &str, maker: &str, model: &str, tipo: &str, colour: &str, year: u16, owner: &str) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string()),
     };
@@ -56,7 +78,8 @@ pub fn insert_vehicle(domain: &str, maker: &str, model: &str, tipo: &str, colour
     }
 }
 pub fn update_vehicles(domain: &str, owner: &str) -> Result <String, String>{
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -69,7 +92,8 @@ pub fn update_vehicles(domain: &str, owner: &str) -> Result <String, String>{
     }
 }
 pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &str, supplier: &str, model: &str, stock: u16) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -82,7 +106,8 @@ pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &
     }
 }
 pub fn update_balance(date: &str, tipo: &str, amount: f32, name: &str) -> Result<String, String> {
-    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -95,7 +120,8 @@ pub fn update_balance(date: &str, tipo: &str, amount: f32, name: &str) -> Result
     }
 }
 pub fn update_order(id: &str, paid: f32) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -108,7 +134,8 @@ pub fn update_order(id: &str, paid: f32) -> Result<String, String> {
     }
 }
 pub fn insert_order(id: &str, client: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, paid: f32) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -121,10 +148,8 @@ pub fn insert_order(id: &str, client: &str, vehicle: &str, concept: &str, kilome
     }
 }
 pub fn read_all_budgets() -> Result<Vec<HashMap<String, String>>, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
-        Ok(conn) => conn,
-        Err(_) => return Err("Failed to open database connection".to_string()),
-    };
+    let path = get_db_path();
+    let conn = Connection::open(path).unwrap();
     let mut stmt = match conn.prepare("SELECT * FROM budgets") {
         Ok(stmt) => stmt,
         Err(_) => return Err("Failed to prepare SQL statement".to_string()),
@@ -164,7 +189,8 @@ pub fn read_all_budgets() -> Result<Vec<HashMap<String, String>>, String> {
     Ok(budgets)
 } 
 pub fn read_all_orders() -> Result<Vec<HashMap<String, String>>, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -209,7 +235,8 @@ pub fn read_all_orders() -> Result<Vec<HashMap<String, String>>, String> {
     Ok(orders)
 } 
 pub fn read_all_history() -> Result<Vec<HashMap<String, String>>, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -256,7 +283,8 @@ pub fn read_all_history() -> Result<Vec<HashMap<String, String>>, String> {
     Ok(history)
 }
 pub fn read_all_details(id: &str) -> Result<Vec<HashMap<String, String>>, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -304,7 +332,8 @@ pub fn read_all_details(id: &str) -> Result<Vec<HashMap<String, String>>, String
     Ok(details)
 } 
 pub fn read_all_vehicles() -> Result<Vec<HashMap<String, String>>, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string()),
     };
@@ -348,7 +377,8 @@ pub fn read_all_vehicles() -> Result<Vec<HashMap<String, String>>, String> {
     Ok(vehicles)
 }
 pub fn read_all_items() -> Result<Vec<HashMap<String, String>>, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string()),
     };
@@ -394,7 +424,8 @@ pub fn read_all_items() -> Result<Vec<HashMap<String, String>>, String> {
     Ok(inventory)
 }
 pub fn read_all_customers() -> Result<Vec<HashMap<String, String>>, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -433,7 +464,8 @@ pub fn read_all_customers() -> Result<Vec<HashMap<String, String>>, String> {
     Ok(customers)
 }
 pub fn read_all_workers() -> Result<Vec<HashMap<String, String>>, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -472,7 +504,8 @@ pub fn read_all_workers() -> Result<Vec<HashMap<String, String>>, String> {
     Ok(workers)
 }
 pub fn read_all_movements(date: &str) -> Result<Vec<HashMap<String, String>>, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db"){
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string()),
     };
@@ -510,7 +543,8 @@ pub fn read_all_movements(date: &str) -> Result<Vec<HashMap<String, String>>, St
     Ok(balance)
 }
 pub fn read_budget(id: &str) -> Result<Budget, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -534,7 +568,8 @@ pub fn read_budget(id: &str) -> Result<Budget, String> {
     }
 }
 pub fn read_order(id: &str) -> Result<Order, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -558,7 +593,8 @@ pub fn read_order(id: &str) -> Result<Order, String> {
     }
 }
 pub fn read_details(id: &str) -> Result<Vec<HashMap<String, String>>, String>{
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -604,7 +640,8 @@ pub fn read_details(id: &str) -> Result<Vec<HashMap<String, String>>, String>{
     Ok(details)
 }
 pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, subtotal: f32, iva: f32, total: f32) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -617,7 +654,8 @@ pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, sub
     }
 }
 pub fn insert_worker(name: &str, dni: &str, phone: &str, address: &str, salary: f32) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -630,7 +668,8 @@ pub fn insert_worker(name: &str, dni: &str, phone: &str, address: &str, salary: 
     }
 }
 pub fn insert_payment(name: &str, dni: &str, date: &str, amount: f32) -> Result<String, String> {
-    let conn = match Connection::open("C:/Users/r4y/Desktop/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -654,7 +693,8 @@ pub fn insert_history(id: &str, order: Order, date: &str) -> Result<String, Stri
     };
 
     // Create DB connection
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
@@ -669,7 +709,8 @@ pub fn insert_history(id: &str, order: Order, date: &str) -> Result<String, Stri
 
 // Delete from DB
 pub fn delete_budget(id: &str) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string())
     };
@@ -682,7 +723,8 @@ pub fn delete_budget(id: &str) -> Result<String, String> {
     }
 }
 pub fn delete_order(id: &str) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string())
     };
@@ -695,7 +737,8 @@ pub fn delete_order(id: &str) -> Result<String, String> {
     }
 }
 pub fn delete_from_history(id: &str) -> Result<String, String> {
-    let conn = match Connection::open("/home/syltr1x/work_dir/Punto_Diesel/src/debug.db") {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(e) => return Err(e.to_string()),
     };

@@ -1,3 +1,5 @@
+mod schema;
+use schema::*;
 mod database;
 use database::*;
 mod output;
@@ -161,6 +163,9 @@ fn delete_history(id: &str) -> Result<String, String> {
 }
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let path = database::get_db_path();
+    create_tables(path);
+
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_vehicle,
