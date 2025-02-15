@@ -84,6 +84,13 @@ pub fn update_vehicles(domain: &str, owner: &str) -> Result <String, String>{
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
     match conn.execute(
+        "UPDATE vehicles SET owner='' WHERE owner=?1",
+        params![owner]
+    ) {
+        Ok(ok) => ok,
+        Err(e) => return Err(e.to_string())
+    };
+    match conn.execute(
         "UPDATE vehicles SET owner=?1 WHERE domain=?2",
         params![owner, domain]
     ) {
