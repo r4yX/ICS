@@ -3,7 +3,11 @@
 		<div id="create-vehicle">
 			<button @click="toggleVehicle()" id="cancel" title="Cancelar"><svg-icon type="mdi" :path="mdiClose" /></button>
     <form id="vehicle-form">
-				<input v-model="owner" id="owner" title="Dueño" placeholder="Nombre Apellido" />
+				<VueSelect class="vue-select"
+					id="owner"
+					v-model="owner"
+					:options="customers"
+					placeholder="Dueño" />
 				<div class="cols">
 					<label for="plate">Patente *</label>
 					<input v-model="plate" id="plate" placeholder="AAA000" />
@@ -47,12 +51,13 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { invoke } from "@tauri-apps/api/core";
 import VueSelect from "vue3-select-component";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiCheck } from "@mdi/js"
 
+const customers = ref([]);
 const owner = ref("");
 const plate = ref("");
 const maker = ref("");
@@ -62,27 +67,37 @@ const colour = ref("");
 const year = ref(0);
 
 export default {
-	methods: {
-		toggleVehicle() {
-			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
-			if (!userConfirmed) {return 0}
-			this.$emit('destroy');
-		}
-	},
 	name: 'CreateVehicle',
 	components: {
 		VueSelect,
 		SvgIcon,
 	},
-	setup({ emit }) {
+	setup(props, { emit }) {
+		const updateCustomers = async() => {
+			let log = await invoke('obtain_customers');
+			customers.value = log;
+		}
+
+		const toggleVehicle = () => {
+			if (plate.value == "" || maker.value == "") {emit('destroy'); return 0}
+			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
+			if (!userConfirmed) {return 0}
+			emit('destroy');
+		}
+
 		const addVehicle = async() => {
+			if (plate.value == "" || maker.value == "") {return 1}
 			let log = await invoke('create_vehicle', {
 			'domain':plate.value, 'maker': maker.value, 'model':model.value, 'tipo':tipo.value,
 			'colour':colour.value, 'year':parseInt(year.value), 'owner': owner.value})
 			alert(log)
+			emit('destroy');
+			emit('refresh-vehicles');
 		}
+		onMounted(updateCustomers)
 
 		return {
+			customers,
 			// Input vars
 			owner,
 			plate,
@@ -92,6 +107,7 @@ export default {
 			colour,
 			year,
 			// Functions
+			toggleVehicle,
 			addVehicle,
 			// Icons
 			mdiClose, mdiCheck
@@ -160,7 +176,7 @@ export default {
 }
 #vehicle-form {
 	height: 80%;
-	margin: 3.5rem auto au0;
+	margin: 3.5rem auto 0 auto;
   width: 90%;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -192,6 +208,7 @@ export default {
   margin: 0 0 .4rem 0;
 }
 #owner {
+	width: 20rem;
   position: absolute;
   margin: 0px;
   top: .6rem;

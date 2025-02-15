@@ -4,14 +4,13 @@
 			<h2>Vehiculos</h2>
 			<button @click="toggleVehicle"><svg-icon type="mdi" :path="mdiPlus"/></button>
 		</div>
-		<component :is="VehicleComponent" @destroy="VehicleComponent = null"/>
+		<component :is="VehicleComponent" @destroy="VehicleComponent = null" @refresh-vehicles="updateVehicles"/>
 		<ul>
 		<Vehicle
         v-for="(vehicle, index) in vehicles"
         :key="index"
         :data="vehicle"
         :index="index"
-				@refresh-budgets="updateVehicles"
 		/>
 		</ul>
   </div>
