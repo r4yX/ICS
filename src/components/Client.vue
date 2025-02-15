@@ -105,8 +105,9 @@ export default {
 	all: none
 }
 #header {
+	width: 90%;
+	align-self: start;
 	display: grid;
-	grid-column-gap: 2rem;
 	grid-template-columns: 1fr 1fr 1fr;
 	justify-items: center;
 	align-items: center;

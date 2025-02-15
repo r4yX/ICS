@@ -72,20 +72,12 @@ export default {
 			required: false
 		}
 	},
-	methods: {
-		toggleCustomer() {
-			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
-			if (!userConfirmed) {return 0}
-			this.$emit('destroy');
-			this.$emit('clear-customer');
-		}
-	},
 	name: 'CreateCustomer',
 	components: {
 		VueSelect,
 		SvgIcon,
 	},
-	setup(props) {
+	setup(props, { emit }) {
 		const customer = ref("");
 		const phone = ref("");
 		const tipo = ref("");
@@ -107,9 +99,20 @@ export default {
 		const updateCars = async() => {
 			let res = await invoke('obtain_vehicles')
 			for (let r in res) {
-				domains.value.push({"label": res[r].domain, "value":res[r].domain})
+				if (res[r].owner.length < 1) {
+					domains.value.push({"label": res[r].domain, "value":res[r].domain})
+				}
 			}
 		}
+
+		const toggleCustomer = () => {
+			if (customer.value == "" && cuit.value == "") {emit('destroy'); return 0}
+			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
+			if (!userConfirmed) {return 0}
+			emit('destroy');
+			emit('clear-customer');
+		}
+
 		const delCar = (index) => {vehicles.value.splice(index, 1);};
 
 		const addCar = () => {
@@ -120,6 +123,8 @@ export default {
 			let log = await invoke('create_customer', {'name': customer.value, 'phone': phone.value,
 			'cuit': cuit.value, 'dni': dni.value, 'tipo': tipo.value, 'vehicles': vehicles.value})
 			alert(log)
+			emit('refresh-customers');
+			emit('destroy');
 		}
 		onMounted(updateCars)
     // -- Return
@@ -134,6 +139,7 @@ export default {
 			vehicles,
 			dni,
 			// Functions
+			toggleCustomer,
 			addCar,
 			delCar,
 			addCustomer,

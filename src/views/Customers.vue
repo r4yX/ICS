@@ -8,16 +8,16 @@
 			:is="customerComponent" 
 			:data="selectedCustomer"
 			@destroy="customerComponent = null"
-			@clear-customer="selectCustomer" />
+			@clearCustomer="selectCustomer" /> 
 		<ul>
 			<Client
 					v-for="(client, index) in clients"
 					:key="index"
 					:data="client"
 					:index="index"
-					@refresh-budgets="updateCustomers"
-					@select-customer="selectCustomer"
-					@edit="toggleCustomer" /> 
+					@edit="toggleCustomer"
+					@refresh-customer="updateCustomers"
+					@select-customer="selectCustomer" /> 
 		</ul>
   </div>
 </template>
