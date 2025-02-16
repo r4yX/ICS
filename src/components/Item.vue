@@ -11,7 +11,7 @@
 			<p v-if="data.tipo == 'product'" title="Proveedor"><svg-icon type="mdi" :path="mdiAccountTag"/>{{ data.supplier}}</p>
 			<p v-if="data.tipo == 'product'" title="Stock"><svg-icon type="mdi" :path="mdiFormatListBulleted"/>{{ data.stock }}</p>
 		</div>
-		<button title="Eliminar" id="checkBtn" @click="addOwner()"><svg-icon type="mdi" :path="mdiPencil"/></button>
+		<button title="Eliminar" id="checkBtn" @click="editItem(data)"><svg-icon type="mdi" :path="mdiPencil"/></button>
 	</div>
 </template>
 
@@ -32,7 +32,7 @@ export default {
 	components: {
 		SvgIcon,
 	},
-	setup(props) {
+	setup(props, { emit }) {
 		const toggleCard = async(e) => {
 			let cardParent = e.target.parentElement;
 			while (cardParent.tagName.toLowerCase() != 'div') {
@@ -41,13 +41,14 @@ export default {
 			cardParent.classList.toggle('closed');
 		};
 
-		const addOwner = async() => {
-			console.log(props.data.domain)
+		const editItem = async(data) => {
+			emit("select-item", data)
+			emit("edit")
 		}
 
 		return {
+			editItem,
 			toggleCard,
-			addOwner,
 			// Icons
 			mdiArrowExpandDown, mdiIdentifier, mdiInformationVariant, mdiCurrencyUsd, mdiHelp,
 			mdiDomain, mdiInformation, mdiAccountTag, mdiFormatListBulleted, mdiPencil

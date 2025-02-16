@@ -4,14 +4,20 @@
 			<h2>Inventario</h2>
 			<button @click="toggleItem"><svg-icon type="mdi" :path="mdiPlus"/></button>
 		</div>
-		<component :is="ItemComponent" @destroy="ItemComponent = null"/>
+		<component 
+				:data="selectedItem"
+				:is="ItemComponent"
+				@refresh-items="updateInventory"
+				@clear-item="selectItem"
+				@destroy="ItemComponent = null"/>
 		<ul>
 		<Item
         v-for="(item, index) in inventory"
         :key="index"
         :data="item"
         :index="index"
-				@refresh-items="updateInventory"
+				@select-item="selectItem"
+				@edit="toggleItem"
 				/>
 		</ul>
   </div>
@@ -33,8 +39,9 @@ export default {
 		Item
   },
 	setup() {
-		const inventory = ref([]);
+		const inventory = ref({});
 		const ItemComponent = shallowRef(null);
+		const selectedItem = ref()
 
 		const toggleItem = () => {
 			if (!ItemComponent.value) {
@@ -44,15 +51,21 @@ export default {
       }
 		};
 		
+		const selectItem = (data) => {
+			selectedItem.value = data;
+		}
+		
 		const updateInventory = async() => {
 			let log = await invoke('obtain_items', {'tipo':"none"})
 			inventory.value = log
 		}
 		onMounted(updateInventory)
 		return {
+			selectedItem,
 			inventory,
 			updateInventory,
 			ItemComponent,
+			selectItem,
 			toggleItem,
 			mdiPlus,
 		}

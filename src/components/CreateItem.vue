@@ -54,21 +54,11 @@ import VueSelect from "vue3-select-component";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiCheck } from "@mdi/js"
 
-const name = ref("");
-const idn = ref("");
-const price = ref(0.0);
-const tipo = ref("");
-const brand = ref("");
-const model = ref("");
-const supplier = ref("");
-const stock = ref(0);
-
 export default {
-	methods: {
-		toggleItem() {
-			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
-			if (!userConfirmed) {return 0}
-			this.$emit('destroy');
+	props: {
+		data: {
+			type: Object,
+			required: false,
 		}
 	},
 	name: 'CreateItem',
@@ -76,12 +66,45 @@ export default {
 		VueSelect,
 		SvgIcon,
 	},
-	setup() {
+	setup(props, { emit }) {
+		const name = ref("");
+		const idn = ref("");
+		const price = ref(0.0);
+		const tipo = ref("");
+		const brand = ref("");
+		const model = ref("");
+		const supplier = ref("");
+		const stock = ref(0);
+
+		if (props.data != undefined) {
+			name.value = props.data.name
+			idn.value = props.data.id
+			price.value = props.data.price
+			tipo.value = props.data.tipo
+			if (props.data.tipo == "Producto") {
+				brand.value = props.data.brand
+				model.value = props.data.model
+				supplier.value = props.data.supplier
+				stock.value = props.data.stock
+			}
+		}
+
+		const toggleItem = () => {
+			if (name.value == "" && price.value == 0.0) {emit('destroy'); return 0}
+			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
+			if (!userConfirmed) {return 0}
+			emit('clear-item')
+			emit('destroy');
+		}
 		const addItem = async() => {
+			console.log('"'+brand.value+'"')
+			console.log(typeof brand.value)
 			let log = await invoke('create_item', {'id':idn.value, 'name':name.value,
 			'price':parseFloat(price.value), 'tipo':tipo.value, 'manufacturer':brand.value,
 			'supplier':supplier.value, 'model':model.value, 'stock':parseInt(stock.value)})
 			alert(log)
+			emit('refresh-items')
+			emit('destroy')
 		}
 		return {
 			// Input vars
@@ -94,6 +117,7 @@ export default {
 			supplier,
 			stock,
 			// Functions
+			toggleItem,
 			addItem,
 			// Icons
 			mdiClose, mdiCheck

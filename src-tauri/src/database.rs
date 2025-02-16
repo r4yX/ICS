@@ -105,7 +105,9 @@ pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
     match conn.execute(
-        "INSERT INTO inventory (id, name, price, tipo, manufacturer, supplier, model, stock) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+        "INSERT INTO inventory (id, name, price, tipo, manufacturer, supplier, model, stock) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+        ON CONFLICT(id) DO UPDATE SET name=excluded.name, price=excluded.price, tipo=excluded.tipo, manufacturer=excluded.manufacturer, 
+        supplier=excluded.supplier, model=excluded.model, stock=excluded.stock",
         params![id, name, price, tipo, manufacturer, supplier, model, stock],
     ) {
         Ok(_) => Ok(format!("Item {} created successfully.", name)),
