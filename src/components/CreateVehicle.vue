@@ -75,7 +75,10 @@ export default {
 	setup(props, { emit }) {
 		const updateCustomers = async() => {
 			let log = await invoke('obtain_customers');
-			customers.value = log;
+			console.log(log)
+			for (let x in log) {
+				customers.value.push({"label": log[x].name, "value":log[x].name})
+			}
 		}
 
 		const toggleVehicle = () => {
