@@ -64,6 +64,10 @@ fn create_history(id: &str, pay_date: &str) -> Result<String, String> {
         Ok(_) => "History entry inserted successfully",
         Err(e) => return Err(format!("Err: ({}) creating history entry {}", e, id))
     };
+    match delete_detail(id) {
+        Ok(_) => "Old details info deleted successfully",
+        Err(e) => return Err(format!("Err: ({}) cleaning old details({}) info", e, id ))
+    };
     match delete_order(id) {
         Ok(_) => Ok("Order paid successfully and archived".to_string()),
         Err(e) => Err(format!("Err: ({}) moving order {}", e, id))

@@ -745,6 +745,20 @@ pub fn delete_order(id: &str) -> Result<String, String> {
         Err(e) => Err(e.to_string()),
     }
 }
+pub fn delete_detail(id: &str) -> Result<String, String> {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
+        Ok(conn) => conn,
+        Err(e) => return Err(e.to_string())
+    };
+    match conn.execute(
+        "DELETE FROM details WHERE id=?1",
+        params![id]
+    ) {
+        Ok(_) => Ok(format!("Detail {} deleted", id)),
+        Err(e) => Err(e.to_string())
+    }
+}
 pub fn delete_from_history(id: &str) -> Result<String, String> {
     let path = get_db_path();
     let conn = match Connection::open(path) {
