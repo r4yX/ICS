@@ -485,15 +485,15 @@ pub fn read_all_workers() -> Result<Vec<HashMap<String, String>>, String> {
     let workers_iter = match stmt.query_map([], |row| {
         let mut map = HashMap::new();
         let name: String = row.get(0)?;
-        let phone: String = row.get(1)?;
-        let dni: String = row.get(2)?;
+        let dni: String = row.get(1)?;
+        let phone: String = row.get(2)?;
         let address: String = row.get(3)?;
         let salary: f32 = row.get(4)?;
 
         // Insert values in the HashMap
         map.insert("name".to_string(), name);
-        map.insert("phone".to_string(), phone);
         map.insert("dni".to_string(), dni);
+        map.insert("phone".to_string(), phone);
         map.insert("address".to_string(), address);
         map.insert("salary".to_string(), salary.to_string());
         Ok(map)
@@ -771,5 +771,19 @@ pub fn delete_from_history(id: &str) -> Result<String, String> {
     ) {
         Ok(_) => Ok(format!("History id: {} deleted successfully", id)),
         Err(e) => Err(format!("Err ({}) deleting {} history", e, id))
+    }
+}
+pub fn delete_worker(dni: &str) -> Result<String, String> {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
+        Ok(conn) => conn,
+        Err(e) => return Err(e.to_string()),
+    };
+    match conn.execute(
+        "DELETE FROM workers WHERE dni=?1",
+        params![dni]
+    ) {
+        Ok(_) => Ok(format!("Worker {} deleted successfully", dni)),
+        Err(e) => Err(format!("Err ({}) deleting {} worker", e, dni))
     }
 }

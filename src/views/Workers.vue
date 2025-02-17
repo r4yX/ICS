@@ -4,15 +4,20 @@
 			<h2>Trabajadores</h2>
 			<button @click="toggleWorker()" title="Añadir Trabajador"><svg-icon type="mdi" :path="mdiPlus" /></button>
 		</div>
-		<component :is="workerComponent" @destroy="workerComponent = null" @refresh-workers="updateWorkers"/>
+		<component
+			:is="workerComponent"
+			@destroy="workerComponent = null"
+			@refresh-workers="updateWorkers"/>
 		<ul>
 			<Worker
-					v-for="(worker, index) in workers"
-					:key="index"
-					:data="worker"
-					:index="index"
-			/>
+				v-for="(worker, index) in workers"
+				:key="index"
+				:data="worker"
+				:index="index"
+				@selectWorker="selectWorker"
+				@refresh-workers="updateWorkers" />
 		</ul>
+		<p v-if="selectedWorker">Pagos de {{ selectedWorker }}:</p>
   </div>
 </template>
 
@@ -32,6 +37,7 @@ export default {
 		Worker
   },
 	setup() {
+		const selectedWorker = ref(null);
 		const workerComponent = shallowRef(null);
 		const workers = ref([]);
 
@@ -42,17 +48,24 @@ export default {
         workerComponent.value = null;
       }
 		};
+
+		const selectWorker = (data) => {
+			console.log(data.dni)
+		}
+
 		const updateWorkers = async() => {
 			let log = await invoke('obtain_workers')
 			workers.value = log
 		}
 		onMounted(updateWorkers)
 		return {
+			toggleWorker,
 			workers,
 			updateWorkers,
-			mdiPlus,
-			toggleWorker,
-			workerComponent
+			selectWorker,
+			selectedWorker,
+			workerComponent,
+			mdiPlus
 		}
 	},
 };

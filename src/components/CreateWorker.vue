@@ -36,26 +36,26 @@ import VueSelect from "vue3-select-component";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiCheck } from "@mdi/js"
 
-const name = ref("");
-const dni = ref("");
-const phone = ref("");
-const salary = ref(0.0);
-const address = ref("");
 
 export default {
-	methods: {
-		toggleCustomer() {
-			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
-			if (!userConfirmed) {return 0}
-			this.$emit('destroy');
-		}
-	},
 	name: 'CreateWorker',
 	components: {
 		VueSelect,
 		SvgIcon,
 	},
 	setup({ emit }) {
+		const name = ref("");
+		const dni = ref("");
+		const phone = ref("");
+		const salary = ref(0.0);
+		const address = ref("");
+		
+		const toggleCustomer = () => {
+			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
+			if (!userConfirmed) {return 0}
+			emit('destroy');
+		}
+
 		const addWorker = async() => {
 			if (address.value == "") {address.value = "none"}
 			let log = await invoke('create_worker', {'name': name.value, 'dni': dni.value,
@@ -74,6 +74,7 @@ export default {
 			salary,
 			address,
 			// Functions
+			toggleCustomer,
 			addWorker,
 			// Icons
 			mdiClose,	mdiCheck

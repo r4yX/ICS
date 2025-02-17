@@ -8,8 +8,8 @@
 			<p title="Direccion"><svg-icon type="mdi" :path="mdiHome"/>{{ data.address }}</p>
 			<p title="Salario"><svg-icon type="mdi" :path="mdiCashRegister"/>{{ data.salary }}</p>
 		</div>
-		<button title="checkPay" id="checkBtn" @click="getPays()"><svg-icon type="mdi" :path="mdiCurrencyUsd"/></button>
-		<button title="Eliminar" id="checkBtn" @click="getPays()"><svg-icon type="mdi" :path="mdiCurrencyUsd"/></button>
+		<button title="checkPay" class="bottom_btns" id="checkBtn" @click="getPays(data)"><svg-icon type="mdi" :path="mdiCurrencyUsd"/></button>
+		<button title="Eliminar" class="bottom_btns" id="delBtn" @click="delWorker(data)"><svg-icon type="mdi" :path="mdiTrashCan"/></button>
 	</div>
 </template>
 
@@ -18,7 +18,7 @@ import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiArrowExpandDown, mdiAccount, mdiCardAccountDetails, mdiPhone, mdiHome,
-		mdiCashRegister, mdiCurrencyUsd} from '@mdi/js';
+		mdiCashRegister, mdiTrashCan, mdiCurrencyUsd} from '@mdi/js';
 
 export default {
 	props: {
@@ -30,7 +30,7 @@ export default {
 	components: {
 		SvgIcon,
 	},
-	setup(props) {
+	setup(props, { emit }) {
 		const toggleCard = async(e) => {
 			let cardParent = e.target.parentElement;
 			while (cardParent.tagName.toLowerCase() != 'div') {
@@ -39,16 +39,25 @@ export default {
 			cardParent.classList.toggle('closed');
 		};
 
-		const addOwner = async() => {
-			console.log(props.data.domain)
+		const getPays = (data) => {
+			emit('selectWorker', data)
+		}
+		
+		const delWorker = async(worker) => {
+			let userCheck = confirm("Do you want to delete worker?")
+			if (!userCheck) {return 0}
+			let log = await invoke('remove_worker', {'dni': worker.dni})
+			alert(log)
+			emit('refresh-workers')
 		}
 
 		return {
 			toggleCard,
-			addOwner,
+			getPays,
+			delWorker,
 			// Icons
 			mdiArrowExpandDown, mdiAccount, mdiCardAccountDetails, mdiPhone, mdiHome, 
-			mdiCashRegister, mdiCurrencyUsd,
+			mdiCashRegister, mdiTrashCan, mdiCurrencyUsd,
 		}
 	},
 };
@@ -111,17 +120,18 @@ export default {
 	justify-items: center;
 	align-items: center;
 }
-#checkBtn {
+.bottom_btns {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	height: 2.2rem;
 	width: 2.2rem;
 	position: absolute;
-	right: .6rem;
 	bottom: .5rem;
 	border: none;
 	cursor: pointer;
 	border-radius: .5rem;
 }
+#checkBtn { right: .6rem }
+#delBtn { left: .6rem }
 </style>
