@@ -4,21 +4,20 @@
 			<button @click="toggleItem()" id="cancel" title="Cancelar"><svg-icon type="mdi" :path="mdiClose" /></button>
     <form id="item-form">
 				<div class="cols">
-					<label for="name">Nombre *</label>
-					<input v-model="name" id="name" placeholder="Cambio de Aceite" />
+					<label>Nombre *</label>
+					<input v-model="name" placeholder="Cambio de Aceite" />
 				</div>
 				<div class="cols">
-					<label id="idn">ID</label>
-					<input v-model="idn" id="idn" type="text" placeholder="0000 or F0000">
+					<label>ID</label>
+					<input v-model="idn" :disabled="idDisabled" type="text" placeholder="0000 or F0000">
 				</div>
 				<div class="cols">
-					<label for="price">Precio *</label>
-					<input v-model="price" id="price" placeholder="0.000,00" />
+					<label>Precio *</label>
+					<input v-model="price" placeholder="0.000,00" />
 				</div>
 				<div class="cols">
-					<label for="tipo">Tipo de Item *</label>
+					<label>Tipo de Item *</label>
 					<VueSelect class="vue-select"
-						id="tipo"
 						v-model="tipo"
 						:options="[
 							{ label: 'Producto', value: 'product' },
@@ -30,16 +29,16 @@
 					<input v-model="brand" id="brand" placeholder="Denso" />
 				</div>
 				<div :class="{cols:true, hidden: tipo != 'product'}">
-					<label for="model">Modelo</label>
-					<input v-model="model" id="model" type="text" placeholder="Inyector Common Rail">
+					<label>Modelo</label>
+					<input v-model="model" type="text" placeholder="Inyector Common Rail">
 				</div>
 				<div :class="{cols:true, hidden: tipo != 'product'}">
-					<label for="supplier">Proveedor</label>
-					<input v-model="supplier" id="supplier" type="text" placeholder="Rosario Filtros">
+					<label>Proveedor</label>
+					<input v-model="supplier" type="text" placeholder="Rosario Filtros">
 				</div>
 				<div :class="{cols:true, hidden: tipo != 'product'}">
-					<label for="stock">Stock</label>
-					<input v-model="stock" id="stock" type="text" placeholder="99">
+					<label>Stock</label>
+					<input v-model="stock" type="text" placeholder="99">
 				</div>
     </form>
 		<button id="confirm" title="Añadir Item" @click="addItem" type="button"><svg-icon type="mdi" :path="mdiCheck" /></button>
@@ -67,6 +66,7 @@ export default {
 		SvgIcon,
 	},
 	setup(props, { emit }) {
+		const idDisabled = ref(false);
 		const name = ref("");
 		const idn = ref("");
 		const price = ref(0.0);
@@ -77,6 +77,7 @@ export default {
 		const stock = ref(0);
 
 		if (props.data != undefined) {
+			idDisabled.value = true
 			name.value = props.data.name
 			idn.value = props.data.id
 			price.value = props.data.price
@@ -97,8 +98,6 @@ export default {
 			emit('destroy');
 		}
 		const addItem = async() => {
-			console.log('"'+brand.value+'"')
-			console.log(typeof brand.value)
 			let log = await invoke('create_item', {'id':idn.value, 'name':name.value,
 			'price':parseFloat(price.value), 'tipo':tipo.value, 'manufacturer':brand.value,
 			'supplier':supplier.value, 'model':model.value, 'stock':parseInt(stock.value)})
@@ -107,6 +106,7 @@ export default {
 			emit('destroy')
 		}
 		return {
+			idDisabled,
 			// Input vars
 			name,
 			idn,
