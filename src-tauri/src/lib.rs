@@ -36,6 +36,10 @@ fn create_order(id: &str, paid: f32, date: &str) -> Result<String, String> {
         Ok(budget) => budget,
         Err(e) => return Err(format!("Error {}. Reading budget with id {}", e, id))
     };
+   // Add to balance
+   if paid != 0.0 {
+       update_balance(date, "Ingreso", &format!("{} - {}", budget.customer, id), budget.total).unwrap();
+   };
     match insert_order(
         id, &budget.customer, &budget.vehicle, &budget.concept,
         budget.kilometrage, budget.total, paid
@@ -43,10 +47,6 @@ fn create_order(id: &str, paid: f32, date: &str) -> Result<String, String> {
         Ok(_) => "Order inserted".to_string(),
         Err(e) => return Err(format!("Error: {}", e)),
     };
-   // Add to balance
-   if paid != 0.0 {
-       update_balance(date, "Ingreso", budget.total, &format!("{} - {}", budget.customer, budget.concept)).unwrap();
-   };
 
     // Delete budget
     match delete_budget(id) {
@@ -109,7 +109,7 @@ fn create_payment(name: &str, dni: &str, date: &str, amount: f32) -> Result<Stri
         Ok(_) => "",
         Err(e) => return Err(e),
     };
-    let res = database::update_balance(date, "Salida", amount, &format!("Pago a {}", name))?;
+    let res = database::update_balance(date, "Salida", &format!("Pago a {}", name), amount)?;
     Ok(res)
 }
 
@@ -168,7 +168,7 @@ fn delete_history(id: &str) -> Result<String, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let path = database::get_db_path();
-    create_tables(path);
+    let _ = create_tables(path);
 
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())

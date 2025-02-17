@@ -114,14 +114,14 @@ pub fn insert_item(id: &str, name: &str, price: f32, tipo: &str, manufacturer: &
         Err(e) => Err(format!("Err ({}) creating item {}", e, name)),
     }
 }
-pub fn update_balance(date: &str, tipo: &str, amount: f32, name: &str) -> Result<String, String> {
+pub fn update_balance(date: &str, tipo: &str, name: &str, amount: f32) -> Result<String, String> {
     let path = get_db_path();
     let conn = match Connection::open(path) {
         Ok(conn) => conn,
         Err(_) => return Err("Failed to open database connection".to_string()),
     };
     match conn.execute(
-        "INSERT balance (date, tipo, amount, name) VALUES (?1, ?2, ?3, ?4)",
+        "INSERT INTO balance (date, tipo, name, amount) VALUES (?1, ?2, ?3, ?4)",
         params![date, tipo, amount, name],
     ) {
         Ok(_) => Ok("Balance updated successfully".to_string()),
