@@ -22,6 +22,8 @@ fn create_pdf(info: output::Information, client: output::Client, vehicle: output
     let res = output::write_pdf(info, client, vehicle, details)?;
     Ok(res)
 }
+
+// Write in database
 #[tauri::command]
 fn create_budget(id: &str, customer: &str, vehicle: &str, concept: &str, kilometrage: f32, total: f32, details: Vec<Detail>) {
    insert_budget(id, customer, vehicle, concept, kilometrage, total).unwrap();
@@ -99,17 +101,19 @@ fn create_worker(name: &str, dni: &str, phone: &str, address: &str, salary: f32)
     Ok(res)
 }
 #[tauri::command]
-fn pay_order(id: &str, paid: f32) -> Result<String, String> {
-    let res = database::update_order(id, paid)?;
-    Ok(res)
-}
-#[tauri::command]
 fn create_payment(name: &str, dni: &str, date: &str, amount: f32) -> Result<String, String> {
     match database::insert_payment(name, dni, date, amount) {
         Ok(_) => "",
         Err(e) => return Err(e),
     };
     let res = database::update_balance(date, "Salida", &format!("Pago a {}", name), amount)?;
+    Ok(res)
+}
+
+// Update database
+#[tauri::command]
+fn pay_order(id: &str, paid: f32) -> Result<String, String> {
+    let res = database::update_order(id, paid)?;
     Ok(res)
 }
 

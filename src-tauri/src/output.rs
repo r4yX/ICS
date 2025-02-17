@@ -116,12 +116,12 @@ pub fn write_pdf(info: Information, client: Client, vehicle: Vehicle, details: V
     for detail in details.iter() {
         let data_row = vec![
             Box::new(Text::new(&detail.item).padded(details_margin)) as Box<dyn Element>,
-            Box::new(Text::new(detail.price.to_string()).padded(details_margin)) as Box<dyn Element>,
+            Box::new(Text::new(detail.price.to_string().replace(".",",")).padded(details_margin)) as Box<dyn Element>,
             Box::new(Text::new(detail.cant.to_string()).padded(details_margin)) as Box<dyn Element>,
-            Box::new(Text::new(detail.subtotal.to_string()).padded(details_margin)) as Box<dyn Element>,
+            Box::new(Text::new(detail.subtotal.to_string().replace(".",",")).padded(details_margin)) as Box<dyn Element>,
             Box::new(Text::new(&detail.tipo).padded(details_margin)) as Box<dyn Element>,
-            Box::new(Text::new(detail.iva.to_string()).padded(details_margin)) as Box<dyn Element>,
-            Box::new(Text::new(detail.total.to_string()).padded(details_margin)) as Box<dyn Element>,
+            Box::new(Text::new(detail.iva.to_string().replace(".",",")).padded(details_margin)) as Box<dyn Element>,
+            Box::new(Text::new(detail.total.to_string().replace(".",",")).padded(details_margin)) as Box<dyn Element>,
         ];
         details_table.push_row(data_row).expect("");
     }
@@ -132,7 +132,7 @@ pub fn write_pdf(info: Information, client: Client, vehicle: Vehicle, details: V
     pay_table.set_cell_decorator(FrameCellDecorator::new(true, true, false));
     pay_table.push_row(vec![
         Box::new(Text::new("Total: ").padded(details_margin)) as Box<dyn Element>,
-        Box::new(Text::new(info.total).padded(details_margin)) as Box<dyn Element>
+        Box::new(Text::new(info.total.replace(".",",")).padded(details_margin)) as Box<dyn Element>
     ]).expect("");
     let padded_pay = pay_table.padded(Margins::trbl(3, 0, 0, 0));
     doc.push(padded_pay);

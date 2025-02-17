@@ -1,7 +1,7 @@
 <template>
 	<div id="carta">
 		<p title="Direccion"><svg-icon type="mdi" :path="mdiCalendar"/>{{ data.date }}</p>
-		<p title="Salario"><svg-icon type="mdi" :path="mdiCashRegister"/>{{ data.amount }}</p>
+		<p title="Salario"><svg-icon type="mdi" :path="mdiCashRegister"/>{{ data.amount.replace(".",",") }}</p>
 	</div>
 </template>
 

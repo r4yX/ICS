@@ -4,8 +4,8 @@
 		<div id="header">
 			<p title="Cliente"><svg-icon type="mdi" :path="mdiAccount"/>{{ data.customer }}</p>
 			<p title="Patente"><svg-icon type="mdi" :path="mdiCar"/>{{ data.vehicle }}</p>
-			<p title="Total"><svg-icon type="mdi" :path="mdiCurrencyUsd"/>{{ data.total }}</p>
-			<p title="Kilometraje"><svg-icon type="mdi" :path="mdiRoadVariant"/>{{ data.kilometrage }}</p>
+			<p title="Total"><svg-icon type="mdi" :path="mdiCurrencyUsd"/>{{ data.total.replace(".",",") }}</p>
+			<p title="Kilometraje"><svg-icon type="mdi" :path="mdiRoadVariant"/>{{ data.kilometrage.replace(".",",") }}</p>
 			<p v-if="data.paid != 'none'" title="Pagado"><svg-icon type="mdi" :path="mdiCashCheck"/>{{ data.paid }}</p>
 			<p v-if="data.pay_date != 'none'" title="Fecha de pago"><svg-icon type="mdi" :path="mdiCashRegister"/>{{ data.pay_date }}</p>
 		</div>
@@ -21,11 +21,11 @@
 				 </tr>
 				 <tr v-for="(detail, index) in details" :key="index">
 					 <td>{{ detail.item }}</td>
-					 <td>{{ detail.price }}</td>
+					 <td>{{ detail.price.replace(".",",") }}</td>
 					 <td>{{ detail.cant }}</td>
-					 <td>{{ detail.subtotal }}</td>
-					 <td>{{ detail.iva }}</td>
-					 <td>{{ detail.total }}</td>
+					 <td>{{ detail.subtotal.replace(".",",") }}</td>
+					 <td>{{ detail.iva.replace(".",",") }}</td>
+					 <td>{{ detail.total.replace(".",",") }}</td>
 				 </tr>
 			 </tbody>
 		 </table>
@@ -117,6 +117,7 @@ export default {
 				'client':{"name": props.data.customer, "dni":"12345678", "phone":"54-3482-500112",
 				"concept":props.data.concept}, 'vehicle':{"plate": props.data.vehicle, "maker": "Chevrolet",
 				"model": "Astra", "kilometrage":props.data.kilometrage}, 'details': details_list})
+			alert(log)
 		}
 
 		// History Funtion (History.vue)

@@ -6,7 +6,7 @@
 			<p title="DNI"><svg-icon type="mdi" :path="mdiCardAccountDetails"/>{{ data.dni }}</p>
 			<p title="Telefono"><svg-icon type="mdi" :path="mdiPhone"/>{{ data.phone }}</p>
 			<p title="Direccion"><svg-icon type="mdi" :path="mdiHome"/>{{ data.address }}</p>
-			<p title="Salario"><svg-icon type="mdi" :path="mdiCashRegister"/>{{ data.salary }}</p>
+			<p title="Salario"><svg-icon type="mdi" :path="mdiCashRegister"/>{{ data.salary.replace(".",",") }}</p>
 		</div>
 		<button title="checkPay" class="bottom_btns" id="checkBtn" @click="getPays(data)"><svg-icon type="mdi" :path="mdiCurrencyUsd"/></button>
 		<button title="Eliminar" class="bottom_btns" id="delBtn" @click="delWorker(data)"><svg-icon type="mdi" :path="mdiTrashCan"/></button>
