@@ -44,13 +44,14 @@ export default {
 		SvgIcon,
 	},
 	setup(props, { emit }) {
-		const name = ref("");
-		const dni = ref("");
-		const phone = ref("");
-		const salary = ref(0.0);
-		const address = ref("");
+		const name = ref(null);
+		const dni = ref(null);
+		const phone = ref(null);
+		const salary = ref(null);
+		const address = ref(null);
 		
 		const toggleCustomer = () => {
+			if (name.value == null || dni.value == null) {emit('destroy'); return 0}
 			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
 			if (!userConfirmed) {return 0}
 			emit('destroy');

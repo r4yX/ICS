@@ -1,6 +1,6 @@
 <template>
-	<div id="card" class="closed">
-		<button id="closeBtn" @click="toggleCard($event)"><svg-icon type="mdi" :path="mdiArrowExpandDown"/></button>
+	<div id="card" :class="{closed: isClosed}">
+		<button id="closeBtn" @click="toggleCard(data)"><svg-icon type="mdi" :path="mdiArrowExpandDown"/></button>
 		<div id="header">
 			<p title="Nombre"><svg-icon type="mdi" :path="mdiAccount"/>{{ data.name }}</p>
 			<p title="DNI"><svg-icon type="mdi" :path="mdiCardAccountDetails"/>{{ data.dni }}</p>
@@ -31,16 +31,14 @@ export default {
 		SvgIcon,
 	},
 	setup(props, { emit }) {
-		const toggleCard = async(e) => {
-			let cardParent = e.target.parentElement;
-			while (cardParent.tagName.toLowerCase() != 'div') {
-				cardParent = cardParent.parentElement
-			}
-			cardParent.classList.toggle('closed');
+		const isClosed = ref(true);
+		const toggleCard = (data) => {
+			isClosed.value = !isClosed.value
+			if (!isClosed.value) { emit('selectWorker', data) }
+			else { emit('selectWorker') }
 		};
 
 		const getPays = (data) => {
-			emit('selectWorker', data)
 		}
 		
 		const delWorker = async(worker) => {
@@ -52,6 +50,7 @@ export default {
 		}
 
 		return {
+			isClosed,
 			toggleCard,
 			getPays,
 			delWorker,
@@ -109,7 +108,6 @@ export default {
 }
 #header {
 	display: grid;
-	grid-column-gap: 2rem;
 	grid-template-columns: 1fr 1fr;
 	justify-items: center;
 	align-items: center;

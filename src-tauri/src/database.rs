@@ -648,6 +648,42 @@ pub fn read_details(id: &str) -> Result<Vec<HashMap<String, String>>, String>{
 
     Ok(details)
 }
+pub fn read_payments(dni: &str) -> Result<Vec<HashMap<String, String>>, String> {
+    let path = get_db_path();
+    let conn = match Connection::open(path) {
+        Ok(conn) => conn,
+        Err(_) => return Err("Failed to open database connection".to_string()),
+    };
+    let mut stmt = match conn.prepare("SELECT * FROM payments WHERE dni=?") {
+        Ok(stmt) => stmt,
+        Err(_) => return Err("Failed to prepare SQL statement".to_string()),
+    };
+    let payments_iter = match stmt.query_map([dni], |row| {
+        let mut map = HashMap::new();
+
+        let _: String = row.get(0)?;
+        let _: String = row.get(1)?;
+        let date: String = row.get(2)?;
+        let amount: f32 = row.get(3)?;
+
+        map.insert("date".to_string(), date);
+        map.insert("amount".to_string(), amount.to_string());
+        Ok(map)
+    }) {
+        Ok(iter) => iter,
+        Err(_) => return Err("Failed to execute query".to_string()),
+    };
+    let mut payments: Vec<HashMap<String, String>> = Vec::new();
+
+    for payment in payments_iter {
+        match payment {
+            Ok(p) => payments.push(p),
+            Err(_) => return Err("Failed to process row".to_string()),
+        }
+    }
+
+    Ok(payments)
+}
 pub fn insert_detail(id: &str, item: &str, price: f32, cant: u8, tipo: &str, subtotal: f32, iva: f32, total: f32) -> Result<String, String> {
     let path = get_db_path();
     let conn = match Connection::open(path) {

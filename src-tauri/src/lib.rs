@@ -159,6 +159,11 @@ fn obtain_balance(date: &str) -> Result<Vec<HashMap<String, String>>, String> {
     let res = read_all_movements(date)?;
     Ok(res)
 }
+#[tauri::command]
+fn obtain_payments(dni: &str) -> Result<Vec<HashMap<String, String>>, String> {
+    let res = read_payments(dni)?;
+    Ok(res)
+}
 // Delete functions
 #[tauri::command]
 fn delete_history(id: &str) -> Result<String, String> {
@@ -180,8 +185,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![create_budget, create_customer, create_vehicle,
         create_item, create_order, create_worker, create_payment, create_history, obtain_budgets,
         obtain_orders, obtain_history, obtain_details, obtain_vehicles, obtain_customers,
-        obtain_items, obtain_workers, obtain_balance, pay_order, create_pdf, delete_history,
-        remove_worker])
+        obtain_items, obtain_workers, obtain_balance, obtain_payments, pay_order, create_pdf,
+        delete_history, remove_worker])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

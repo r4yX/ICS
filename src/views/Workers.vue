@@ -13,11 +13,18 @@
 				v-for="(worker, index) in workers"
 				:key="index"
 				:data="worker"
-				:index="index"
 				@selectWorker="selectWorker"
 				@refresh-workers="updateWorkers" />
 		</ul>
-		<p v-if="selectedWorker">Pagos de {{ selectedWorker }}:</p>
+		<p v-if="selectedWorker != null">Pagos de {{ selectedWorker.name }}:</p>
+		<ul id="pays">
+			<Payment
+					v-if="selectedWorker"
+					v-for="(payment, index) in payments"
+					:key="index"
+					:data="payment"
+			/>
+		</ul>
   </div>
 </template>
 
@@ -28,18 +35,21 @@ import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiPlus } from '@mdi/js';
 import CreateWorker from "@components/CreateWorker.vue";
 import Worker from "@components/Worker.vue";
+import Payment from "@components/Payment.vue";
 
 export default {
   name: 'Workers',
   components: {
     SvgIcon,
 		CreateWorker,
+		Payment,
 		Worker
   },
 	setup() {
 		const selectedWorker = ref(null);
 		const workerComponent = shallowRef(null);
 		const workers = ref([]);
+		const payments = ref([]);
 
 		const toggleWorker = () => {
 			if (!workerComponent.value) {
@@ -50,21 +60,28 @@ export default {
 		};
 
 		const selectWorker = (data) => {
-			console.log(data.dni)
+			selectedWorker.value = data
+			updatePayments(data)
 		}
 
 		const updateWorkers = async() => {
 			let log = await invoke('obtain_workers')
 			workers.value = log
 		}
+		const updatePayments = async(data) => {
+			if (!data) {return 0}
+			let log = await invoke('obtain_payments', {'dni':data.dni})
+			payments.value = log
+		}
 		onMounted(updateWorkers)
 		return {
 			toggleWorker,
+			workerComponent,
 			workers,
 			updateWorkers,
 			selectWorker,
 			selectedWorker,
-			workerComponent,
+			payments,
 			mdiPlus
 		}
 	},
@@ -103,4 +120,24 @@ export default {
 #header > button:hover {
   background: #44e8fb80;
 }
+#main > p {
+	margin: 0 0 0 2rem;
+}
+#pays {
+	display: grid;
+	grid-template-columns: 1fr 1fr; 
+	width: 90%;
+	overflow-y: scroll;
+	overflow-x: scroll;
+}
+@media (min-width: 800px) {
+	#pays { grid-template-columns: repeat(3, 1fr) }
+}
+@media (min-width: 1000px) {
+	#pays { grid-template-columns: repeat(4, 1fr) }
+}
+@media (min-width: 1300px) {
+	#pays { grid-template-columns: repeat(5, 1fr) }
+}
+
 </style>
