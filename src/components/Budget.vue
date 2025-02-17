@@ -68,11 +68,14 @@ export default {
 		const createBudget = async() => {
 			let paid = parseInt(prompt("El cliente ha pagado ($):", "0"))
 			let now = new Date();
-			let approve_date = now.toLocaleString('en-CA', {
+			let approve_date = now.toLocaleString('en-GB', {
 				hour12: false, month: '2-digit', day: '2-digit', year: 'numeric',
 				hour: '2-digit', minute: '2-digit', second: '2-digit'});
 			approve_date = approve_date.replace(',', '')
 			let log = await invoke('create_order', {'id': props.data.id, 'paid': paid, 'date': approve_date})
+			if (paid == props.data.total) {
+				log = await invoke('create_history', {'id': props.data.id, 'payDate': approve_date})
+			}
 			alert(log)
 			emit('refresh-budgets');
 		}
@@ -118,6 +121,8 @@ export default {
 
 		// History Funtion (History.vue)
 		const deleteHistory = async() => {
+			let userverify = confirm("Are you sure you want to delete this archieved")
+			if (!userverify) {return 0}
 			let log = await invoke('delete_history', {'id': props.data.id})
 			alert(log)
 			emit('refresh-history')

@@ -148,7 +148,6 @@ export default {
 		}
 		
 		const fillDetail = (selected) => {
-			console.log(selected)
 			price.value = "";
 			tipo.value = "";
 			if (selected != undefined) {
