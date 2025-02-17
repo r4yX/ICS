@@ -31,7 +31,7 @@
 				</div>
 				<div>
 					<label for="kilometrage">Kilometraje</label>
-					<input id="kilometrage" v-model="kilometrage" type="text" pattern="\d*">
+					<input id="kilometrage" v-model="kilometrage" type="text" placeholder="200.0" pattern="\d*">
 				</div>
 			</div>
       <div id="table">
@@ -48,8 +48,8 @@
 					placeholder="Buscar producto o servicio"
 					@update:modelValue="fillDetail"
 				/>
-				<input id="price" v-model="price" placeholder="0.0"></input>
-				<input id="cant" v-model="cant" placeholder="0"></input>
+				<input id="price" v-model="price" placeholder="100.20"></input>
+				<input id="cant" v-model="cant" placeholder="1"></input>
 				<VueSelect class="vue-select"
 					id="tipo"
 					v-model="tipo"
@@ -57,7 +57,7 @@
 					placeholder="Producto o Servicio"
 				/>
 				<input id="iva" v-model="iva" placeholder="21" pattern="\d*"></input>
-				<button id="save-item" title="Añadir item" @click="addDetail" type="button"><svg-icon type="mdi" :path="mdiPlus" /></button> 
+				<button id="save-item" title="Añadir item" @click="addDetail" type="button" :disabled="item == null || cant == null || price == null || iva == null"><svg-icon type="mdi" :path="mdiPlus" /></button> 
       </div>
 		<div id="details">
 			<p>Item</p>
@@ -76,7 +76,7 @@
         :delDetail="delDetail"
       />
     </form>
-		<button id="confirm" title="Crear Presupuesto" @click="createBudget" type="button"><svg-icon type="mdi" :path="mdiCheck"/></button>
+		<button id="confirm" title="Crear Presupuesto" @click="createBudget" type="button" :disabled="id == null || customer == null || details == [] || vehicle == null"><svg-icon type="mdi" :path="mdiCheck"/></button>
   </div>
 	</div>
 </template>
@@ -95,18 +95,18 @@ const concepts = ref([{ label: 'Reparación', value: 'reparacion' },
 		{ label: 'Revisión', value: 'revision' }, { label: 'Garantia', value: 'garantia' },
 		{ label: 'Otros', value: 'otros' }]);
 // Form fields
+const id = ref(null);
 const customer = ref(null);
 const vehicle = ref(null);
 const concept = ref(null);
 const kilometrage = ref(null);
 const details = ref([]);
 // details fields
-const id = ref();
-const item = ref("");
-const price = ref(0.0);
-const cant = ref(1);
-const tipo = ref("");
-const iva = ref(21);
+const item = ref(null);
+const price = ref(null);
+const cant = ref(null);
+const tipo = ref(null);
+const iva = ref(null);
 //values for selects
 const customers = ref([])
 const domains = ref([])
@@ -168,7 +168,7 @@ export default {
 
 			await invoke('create_budget', {
 				id: id.value, date: formattedDate, customer: customer.value, vehicle: vehicle.value,
-				concept: concept.value, kilometrage: parseFloat(kilometrage.value), total: amount,
+				concept: concept.value, kilometrage: parseFloat(kilometrage.value.replace(",",".")), total: amount,
 				details: details.value
 			})
 
@@ -193,8 +193,8 @@ export default {
 
 		const addDetail = () => {
 			// Parse Values
-			let stotal = price.value*cant.value;
-			let ivaPrice = parseFloat(stotal*iva.value/100);
+			let stotal = price.value.replace(",",".")*cant.value;
+			let ivaPrice = parseFloat(stotal*iva.value.replace(",",".")/100);
 			let total = parseFloat(stotal+ivaPrice);
 
 			details.value.push({
@@ -206,6 +206,12 @@ export default {
 				subtotal: stotal,
 				iva: ivaPrice,
 				total: total});
+				// Clean fields
+				item.value = null
+				price.value = null
+				cant.value = null
+				tipo.value = null
+				iva.value = null
 		};
 
 		addEventListener('keydown', (e) => {
@@ -300,11 +306,16 @@ export default {
   bottom: .6rem;
   right: .6rem;
 }
+#confirm:disabled {
+	color: #777;
+	cursor: not-allowed;
+}
+#confirm:not([disabled]):hover {
+	cursor: pointer;
+	background: #434f3b;
+}
 #cancel:hover {
 	background: #543c3c;
-}
-#confirm:hover {
-	background: #434f3b;
 }
 #budget-number {
   margin: 0px;
@@ -374,7 +385,12 @@ input::placeholder {
 	border-radius: .4rem;
 	transition: background .2s;
 }
-#save-item:hover {
+#save-item:disabled {
+	color: #777;
+	cursor: not-allowed;
+}
+#save-item:not([disabled]):hover {
+	cursor: pointer;
 	background: #088;
 }
 #details {
