@@ -43,7 +43,7 @@ export default {
 		VueSelect,
 		SvgIcon,
 	},
-	setup({ emit }) {
+	setup(props, { emit }) {
 		const name = ref("");
 		const dni = ref("");
 		const phone = ref("");
@@ -62,9 +62,8 @@ export default {
 			'phone': phone.value, 'salary': parseFloat(salary.value), 'address': address.value})
 			alert(log)
 
-			// idk why this doesn't work :(
-			// emit('refresh-workers');
-			// emit('destroy');
+			emit('refresh-workers');
+			emit('destroy');
 		}
 
 		return {
