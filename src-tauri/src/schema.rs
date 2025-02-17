@@ -87,8 +87,9 @@ pub fn create_tables(path: PathBuf) -> Result<(), String> {
     CREATE TABLE IF NOT EXISTS balance (
         date TEXT NOT NULL,
         tipo TEXT NOT NULL,
-        amount DECIMAL(18, 2) NOT NULL,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        amount DECIMAL(18, 2) NOT NULL
+    );
     ") {
         Ok(_) => Ok(()),
         Err(e) => Err(e.to_string()),
