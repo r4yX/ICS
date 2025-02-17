@@ -44,7 +44,7 @@ pub fn create_tables(path: PathBuf) -> Result<(), String> {
     CREATE TABLE IF NOT EXISTS payments (
         name TEXT NOT NULL,
         dni TEXT NOT NULL,
-        date DATETIME NOT NULL,
+        date TEXT NOT NULL,
         amount DECIMAL(18, 2) NOT NULL
     );
     CREATE TABLE IF NOT EXISTS budgets (
