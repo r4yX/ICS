@@ -38,10 +38,13 @@ export default {
 
 			for (let i = 0; i < children.length; i++) {
 					children[i].style.background = '#24c8db20';
+					children[i].onmouseenter = () => children[i].style.background = '#44e8fb80';
+					children[i].onmouseleave = () => children[i].style.background = '#24c8db20';
 			}
       router.push({ name: routeName });
 			let clicked = document.getElementById(routeName);
 			clicked.style.background = '#44e8fb80';
+			clicked.onmouseleave = () => {};
     };
 
     const isMenuHidden = ref(false);
