@@ -97,7 +97,8 @@ export default {
 	flex-direction: column;
 	justify-content: center;
 	margin: 0px auto;
-	width: 35rem;
+	width: 90%;
+	max-width: 28rem;
 }
 .controls {
   display: flex;
