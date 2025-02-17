@@ -58,13 +58,13 @@ import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiClose, mdiCheck } from "@mdi/js"
 
 const customers = ref([]);
-const owner = ref("");
-const plate = ref("");
-const maker = ref("");
-const model = ref("");
-const tipo = ref("");
-const colour = ref("");
-const year = ref(0);
+const owner = ref(null);
+const plate = ref(null);
+const maker = ref(null);
+const model = ref(null);
+const tipo = ref(null);
+const colour = ref(null);
+const year = ref(null);
 
 export default {
 	name: 'CreateVehicle',
@@ -82,14 +82,14 @@ export default {
 		}
 
 		const toggleVehicle = () => {
-			if (plate.value == "" || maker.value == "") {emit('destroy'); return 0}
+			if (plate.value == null || maker.value == null) {emit('destroy'); return 0}
 			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
 			if (!userConfirmed) {return 0}
 			emit('destroy');
 		}
 
 		const addVehicle = async() => {
-			if (plate.value == "" || maker.value == "") {return 1}
+			if (plate.value == null || maker.value == null) {return 1}
 			let log = await invoke('create_vehicle', {
 			'domain':plate.value, 'maker': maker.value, 'model':model.value, 'tipo':tipo.value,
 			'colour':colour.value, 'year':parseInt(year.value), 'owner': owner.value})

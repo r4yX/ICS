@@ -67,14 +67,14 @@ export default {
 	},
 	setup(props, { emit }) {
 		const idDisabled = ref(false);
-		const name = ref("");
-		const idn = ref("");
-		const price = ref(0.0);
-		const tipo = ref("");
-		const brand = ref("");
-		const model = ref("");
-		const supplier = ref("");
-		const stock = ref(0);
+		const name = ref(null);
+		const idn = ref(null);
+		const price = ref(null);
+		const tipo = ref(null);
+		const brand = ref(null);
+		const model = ref(null);
+		const supplier = ref(null);
+		const stock = ref(null);
 
 		if (props.data != undefined) {
 			idDisabled.value = true
@@ -91,7 +91,7 @@ export default {
 		}
 
 		const toggleItem = () => {
-			if (name.value == "" && price.value == 0.0) {emit('destroy'); return 0}
+			if (name.value == null && price.value == null) {emit('destroy'); return 0}
 			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
 			if (!userConfirmed) {return 0}
 			emit('clear-item')

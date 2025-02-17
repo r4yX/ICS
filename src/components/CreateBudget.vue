@@ -95,18 +95,18 @@ const concepts = ref([{ label: 'Reparación', value: 'reparacion' },
 		{ label: 'Revisión', value: 'revision' }, { label: 'Garantia', value: 'garantia' },
 		{ label: 'Otros', value: 'otros' }]);
 // Form fields
-const customer = ref("");
-const vehicle = ref("");
-const concept = ref("");
-const kilometrage = ref(0.0);
+const customer = ref(null);
+const vehicle = ref(null);
+const concept = ref(null);
+const kilometrage = ref(null);
 const details = ref([]);
 // details fields
 const id = ref();
 const item = ref("");
 const price = ref(0.0);
-const cant = ref(0);
+const cant = ref(1);
 const tipo = ref("");
-const iva = ref(0.0);
+const iva = ref(21);
 //values for selects
 const customers = ref([])
 const domains = ref([])
@@ -119,14 +119,13 @@ export default {
 		VueSelect,
 		Detail,
 	},
-	methods: {
-		toggleBudget() {
+	setup(props, { emit }) {
+		const toggleBudget = () => {
+			if (customer.value == null || concept.value == null) {emit('destroy'); return 0}
 			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
 			if (!userConfirmed) {return 0}
-			this.$emit('destroy');
+			emit('destroy');
 		}
-	},
-	setup(props, { emit }) {
 		// Get data for Select
 		const updateVehicles = async() => {
 			let res = await invoke('obtain_vehicles')
@@ -234,6 +233,7 @@ export default {
 			// Inside detail
 			item, price, cant, tipo, iva,
 			// Functions
+			toggleBudget,
 			addDetail,
 			delDetail,
 			createBudget,

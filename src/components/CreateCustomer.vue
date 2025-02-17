@@ -78,12 +78,12 @@ export default {
 		SvgIcon,
 	},
 	setup(props, { emit }) {
-		const customer = ref("");
-		const phone = ref("");
-		const tipo = ref("");
-		const cuit = ref("");
-		const vehicle = ref("");
-		const dni = ref("");
+		const customer = ref(null);
+		const phone = ref(null);
+		const tipo = ref(null);
+		const cuit = ref(null);
+		const vehicle = ref(null);
+		const dni = ref(null);
 		const vehicles = ref([]); 
 		const domains = ref([]);
 
@@ -106,7 +106,7 @@ export default {
 		}
 
 		const toggleCustomer = () => {
-			if (customer.value == "" && cuit.value == "") {emit('destroy'); return 0}
+			if (customer.value == null && cuit.value == null) {emit('destroy'); return 0}
 			const userConfirmed = confirm("¿Seguro de cerrar? Los cambios no se guardaran")
 			if (!userConfirmed) {return 0}
 			emit('destroy');
