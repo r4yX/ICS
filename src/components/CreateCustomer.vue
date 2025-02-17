@@ -87,7 +87,7 @@ export default {
 		const vehicles = ref([]); 
 		const domains = ref([]);
 
-		if (props.data != undefined) {
+		if (props.data.name != undefined) {
 			customer.value = props.data.name
 			phone.value = props.data.phone
 			tipo.value = props.data.tipo
@@ -113,11 +113,9 @@ export default {
 			emit('clear-customer');
 		}
 
-		const delCar = (index) => {vehicles.value.splice(index, 1);};
+		const delCar = (index) => { vehicles.value.splice(index, 1) };
 
-		const addCar = () => {
-			vehicles.value.push(vehicle.value)
-		};
+		const addCar = () => { vehicles.value.push(vehicle.value)	};
 
 		const addCustomer = async() => {
 			let log = await invoke('create_customer', {'name': customer.value, 'phone': phone.value,
