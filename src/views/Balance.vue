@@ -37,6 +37,7 @@ export default {
 			if (data == undefined) {return 0}
 			let log = await invoke('obtain_balance', {'date': data})
 			selectedDay.value = data
+			console.log(log)
 			movements.value = log
 		}
 		onMounted(updateDayMovements)

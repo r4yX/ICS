@@ -122,7 +122,7 @@ pub fn update_balance(date: &str, tipo: &str, name: &str, amount: f32) -> Result
     };
     match conn.execute(
         "INSERT INTO balance (date, tipo, name, amount) VALUES (?1, ?2, ?3, ?4)",
-        params![date, tipo, amount, name],
+        params![date, tipo, name, amount],
     ) {
         Ok(_) => Ok("Balance updated successfully".to_string()),
         Err(_) => Err("Error updating balance".to_string())
@@ -527,14 +527,14 @@ pub fn read_all_movements(date: &str) -> Result<Vec<HashMap<String, String>>, St
         let mut map = HashMap::new();
         let date: String = row.get(0)?;
         let tipo: String = row.get(1)?;
-        let amount: f32 = row.get(2)?;
-        let name: String = row.get(3)?;
+        let name: String = row.get(2)?;
+        let amount: f32 = row.get(3)?;
 
         // Insert values in the HashMap
         map.insert("date".to_string(), date);
         map.insert("tipo".to_string(), tipo);
-        map.insert("amount".to_string(), amount.to_string());
         map.insert("name".to_string(), name);
+        map.insert("amount".to_string(), amount.to_string());
         Ok(map)
     }) {
         Ok(iter) => iter,
