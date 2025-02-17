@@ -12,7 +12,6 @@
       <hr>
       <button @click="navigateTo('balance')" id="balance"><svg-icon type="mdi" :path="mdiCashRegister"/><p>Balance</p></button>
       <button @click="navigateTo('workers')" id="workers"><svg-icon type="mdi" :path="mdiAccountHardHat"/><p>Trabajadores</p></button>
-      <button @click="navigateTo('config')" id="config"><svg-icon type="mdi" :path="mdiCog"/><p>Configuración</p></button>
     </ul>
   </div>
 </template>
@@ -22,7 +21,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiChevronLeft, mdiNoteText, mdiNoteCheck, mdiClock, mdiAccount, mdiCar, mdiFileTable,
-				mdiCashRegister, mdiAccountHardHat, mdiShopping, mdiCog} from '@mdi/js';
+				mdiCashRegister, mdiAccountHardHat, mdiShopping} from '@mdi/js';
 
 export default {
   name: 'Menu',
@@ -61,7 +60,7 @@ export default {
       toggleMenu,
 			// Icons
 			mdiChevronLeft, mdiNoteText, mdiNoteCheck, mdiClock, mdiAccount, mdiCar, mdiFileTable,
-			mdiCashRegister, mdiAccountHardHat,	mdiShopping, mdiCog
+			mdiCashRegister, mdiAccountHardHat,	mdiShopping
     };
   },
 };
